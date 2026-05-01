@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BigJuan — The King of Stake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'LaTequila';
+      src: url('uploads/La Tequila.ttf') format('truetype');
+      font-weight: normal; font-style: normal;
+    }
+    @font-face {
+      font-family: 'LaTequila';
+      src: url('uploads/La Tequila Out.ttf') format('truetype');
+      font-weight: 100; font-style: normal;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      color: #FAFAF7;
+      font-family: 'DM Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      background: linear-gradient(175deg, #0a1f0e 0%, #0d2a14 20%, #112e18 40%, #162c13 60%, #1e2a0f 80%, #2a2008 100%);
+      min-height: 100vh;
+    }
+
+    ::selection { background: rgba(212,168,67,0.3); color: #FAFAF7; }
+    img { max-width: 100%; }
+
+    @keyframes floatA { 0%,100% { transform: translateY(0) rotate(0deg) } 50% { transform: translateY(-12px) rotate(3deg) } }
+    @keyframes floatB { 0%,100% { transform: translateY(0) rotate(0deg) } 50% { transform: translateY(10px) rotate(-2deg) } }
+    @keyframes twinkle { 0%,100% { opacity: 0.06 } 50% { opacity: 0.18 } }
+    @keyframes glowPulse { 0%,100% { opacity: 0.6 } 50% { opacity: 1 } }
+    @keyframes shimmer { 0% { background-position: -200% center } 100% { background-position: 200% center } }
+
+    /* ── Fixed page-level Mexican atmosphere ── */
+    #page-bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+    }
+    #page-bg .pg-sunset {
+      position: absolute; top: -10%; right: -5%; width: 70%; height: 65%;
+      background: radial-gradient(ellipse at 80% 20%, rgba(212,120,58,0.09) 0%, rgba(212,168,67,0.05) 30%, transparent 65%);
+    }
+    #page-bg .pg-green {
+      position: absolute; top: 0; left: 0; width: 50%; height: 100%;
+      background: radial-gradient(ellipse at 0% 40%, rgba(27,107,46,0.1) 0%, transparent 60%);
+    }
+    #page-bg .pg-horizon {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 40%;
+      background: radial-gradient(ellipse at 50% 100%, rgba(212,120,58,0.08) 0%, rgba(158,123,43,0.03) 50%, transparent 80%);
+    }
+    #page-bg .pg-texture {
+      position: absolute; inset: 0; opacity: 0.022;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+    #page-bg .pg-motif {
+      position: absolute; inset: 0; opacity: 0.02;
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23D4A843' stroke-width='0.6'%3E%3Cpath d='M40 8 L46 20 L40 32 L34 20Z'/%3E%3Cpath d='M40 48 L46 60 L40 72 L34 60Z' opacity='0.5'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 80px 80px;
+    }
+    #page-bg .pg-vignette {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 30%, transparent 40%, rgba(5,12,7,0.55) 100%);
+    }
+    .pg-star { position: absolute; border-radius: 50%; background: #F0C75E; animation: twinkle 3s ease-in-out infinite; }
+
+    /* ── Navbar ── */
+    nav#navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 68px;
+      background: transparent; border-bottom: 1px solid transparent;
+      transition: all 0.35s ease;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px;
+    }
+    nav#navbar.scrolled {
+      background: rgba(8,18,10,0.92);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(212,168,67,0.12);
+    }
+    .nav-left { display: flex; align-items: center; gap: 32px; }
+    .nav-logo { height: 48px; }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a {
+      color: #B8B8B0; text-decoration: none;
+      font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      transition: color 0.2s; padding: 8px 0;
+    }
+    .nav-links a:hover { color: #F0C75E; }
+    .nav-cta {
+      background: #D4A843; color: #141414;
+      font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700;
+      padding: 10px 28px; border-radius: 6px;
+      text-decoration: none; text-transform: uppercase; letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .nav-cta:hover { background: #F0C75E; transform: translateY(-1px); }
+
+    /* ── Hero ── */
+    #home {
+      min-height: 100vh; display: flex; align-items: center;
+      position: relative; overflow: hidden;
+      padding: 100px 48px 0;
+      z-index: 1;
+    }
+    #home::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(10,32,16,0.25) 0%, rgba(13,42,20,0.15) 50%, transparent 100%);
+    }
+    .hero-sun-outer {
+      position: absolute; top: 14%; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(240,199,94,0.1) 0%, rgba(212,168,67,0.04) 45%, transparent 70%);
+    }
+    .hero-sun-ring {
+      position: absolute; top: 18%; left: 50%; transform: translateX(-50%);
+      width: 400px; height: 400px; border-radius: 50%;
+      border: 1px solid rgba(240,199,94,0.09);
+    }
+    .hero-sun-ring2 {
+      position: absolute; top: 22%; left: 50%; transform: translateX(-50%);
+      width: 300px; height: 300px; border-radius: 50%;
+      border: 1px solid rgba(240,199,94,0.05);
+    }
+    .papel-picado {
+      position: absolute; top: 68px; left: 0; width: 100%; opacity: 0.07; pointer-events: none;
+    }
+    .diamond { position: absolute; transform: rotate(45deg); pointer-events: none; }
+
+    .hero-content {
+      max-width: 1000px; margin: 0 auto; width: 100%;
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    .hero-mascot-wrap { position: relative; margin-bottom: 8px; }
+    .mascot-glow-outer {
+      position: absolute; width: 520px; height: 520px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(240,199,94,0.13) 0%, rgba(212,168,67,0.05) 40%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      animation: glowPulse 4s ease-in-out infinite;
+    }
+    .mascot-halo {
+      position: absolute; width: 420px; height: 420px; border-radius: 50%;
+      border: 1px solid rgba(240,199,94,0.12);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+    }
+    .hero-mascot {
+      width: 380px; position: relative;
+      filter: drop-shadow(0 20px 60px rgba(0,0,0,0.55)) drop-shadow(0 4px 20px rgba(212,168,67,0.25));
+    }
+    .float-accent {
+      position: absolute; user-select: none; pointer-events: none;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+    }
+    .float-accent img { display: block; }
+    .float-accent.a { top: 5%;  left: -14%; animation: floatA 4s ease-in-out infinite; }
+    .float-accent.a img { width: 72px; }
+    .float-accent.b { top: 10%; right: -12%; animation: floatB 3.5s ease-in-out infinite; }
+    .float-accent.b img { width: 58px; transform: scaleX(-1); }
+    .float-accent.c { bottom: 18%; left: -10%; animation: floatB 4.5s ease-in-out infinite; opacity: 0.8; }
+    .float-accent.c img { width: 48px; }
+    .float-accent.d { bottom: 22%; right: -8%; animation: floatA 3.8s ease-in-out infinite; opacity: 0.75; }
+    .float-accent.d img { width: 44px; transform: rotate(20deg); }
+
+    .hero-tagline {
+      font-family: 'DM Sans', sans-serif; font-size: 15px; color: #B8B8B0;
+      letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 18px;
+    }
+    .hero-headline {
+      font-family: 'LaTequila', 'Oswald', sans-serif; font-size: 42px; font-weight: normal;
+      color: #FAFAF7; letter-spacing: 3px; margin-bottom: 32px;
+    }
+    .hero-headline span { color: #F0C75E; }
+    .hero-buttons { display: flex; gap: 16px; margin-bottom: 48px; }
+    .btn-primary {
+      background: #D4A843; color: #141414; font-weight: 700; font-size: 14px;
+      padding: 14px 40px; border-radius: 8px; text-decoration: none;
+      font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1.5px;
+      transition: all 0.2s; display: inline-block;
+      box-shadow: 0 4px 24px rgba(212,168,67,0.3);
+    }
+    .btn-primary:hover { background: #F0C75E; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(212,168,67,0.4); }
+    .btn-outline {
+      background: rgba(255,255,255,0.05); color: #FAFAF7; font-weight: 700; font-size: 14px;
+      padding: 14px 40px; border-radius: 8px; text-decoration: none;
+      font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1.5px;
+      border: 1px solid rgba(212,168,67,0.25); transition: all 0.2s; display: inline-block;
+      backdrop-filter: blur(8px);
+    }
+    .btn-outline:hover { border-color: #D4A843; color: #F0C75E; background: rgba(212,168,67,0.08); }
+
+    .hero-stats { display: flex; gap: 56px; }
+    .hero-stat-val { font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700; color: #FAFAF7; }
+    .hero-stat-label {
+      font-family: 'DM Sans', sans-serif; font-size: 11px; color: #6E6E68;
+      text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;
+    }
+
+    /* ── Cactus landscape divider ── */
+    .cactus-divider { position: relative; width: 100%; overflow: hidden; line-height: 0; pointer-events: none; z-index: 1; }
+    .cactus-divider svg { display: block; width: 100%; }
+
+    /* ── Bonuses section ── */
+    #bonuses {
+      position: relative; z-index: 1; padding: 0 48px 90px; overflow: hidden;
+      background: rgba(8,18,10,0.7);
+    }
+    .sec-glow-gold-tr {
+      position: absolute; top: -20%; right: -10%; width: 60%; height: 80%;
+      background: radial-gradient(ellipse at 80% 20%, rgba(212,168,67,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .sec-glow-green-bl {
+      position: absolute; bottom: -20%; left: -5%; width: 55%; height: 70%;
+      background: radial-gradient(ellipse at 20% 80%, rgba(27,107,46,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .sec-motif {
+      position: absolute; inset: 0; pointer-events: none; opacity: 0.022;
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23D4A843' stroke-width='0.6'%3E%3Cpath d='M40 8 L46 20 L40 32 L34 20Z'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 80px 80px;
+    }
+    .sec-picado {
+      position: absolute; top: 0; left: 0; width: 100%; opacity: 0.06;
+      pointer-events: none; line-height: 0;
+    }
+
+    /* Bonuses heading */
+    .bonuses-heading {
+      text-align: center; position: relative; z-index: 1;
+      margin-top: -50px; margin-bottom: -60px;
+    }
+    .bonuses-heading img {
+      width: min(70vw, 680px); object-fit: contain;
+      filter: drop-shadow(0 8px 40px rgba(212,168,67,0.5));
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), filter 0.4s ease;
+      cursor: pointer;
+    }
+    .bonuses-heading img:hover {
+      transform: scale(1.06) translateY(-4px) rotate(-1deg);
+      filter: drop-shadow(0 14px 48px rgba(240,199,94,0.75)) drop-shadow(0 0 24px rgba(212,120,58,0.45));
+    }
+
+    /* Scattered side cacti */
+    .side-cactus { position: absolute; bottom: 0; pointer-events: none; }
+
+    /* ── Bonus Cards ── */
+    .bonus-cards-grid {
+      display:flex; gap:28px; justify-content:center; align-items:stretch;
+      max-width:960px; margin:8px auto 0; position:relative; z-index:1;
+    }
+    .bonus-card-outer {
+      flex:1; max-width:440px; min-width:0;
+      background:linear-gradient(160deg,#0d2614 0%,#091808 100%);
+      border:1.5px solid rgba(212,168,67,0.25); border-radius:20px;
+      padding:28px; display:flex; flex-direction:column; gap:20px;
+      box-shadow:0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,168,67,0.1);
+      position:relative; overflow:hidden;
+    }
+    .bonus-card-outer::before {
+      content:''; position:absolute; top:-40%; right:-20%; width:280px; height:280px; border-radius:50%;
+      background:radial-gradient(circle, rgba(212,168,67,0.06) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .bonus-card-top { display:flex; align-items:center; justify-content:space-between; }
+    .bonus-region-badge {
+      display:flex; align-items:center; gap:7px;
+      background:rgba(212,168,67,0.1); border:1px solid rgba(212,168,67,0.2);
+      border-radius:20px; padding:5px 12px;
+      font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; color:#B8A878;
+      letter-spacing:0.5px;
+    }
+    .bonus-card-logo { height:32px; object-fit:contain; }
+    .bonus-logo-wrap {
+      height:125px; display:flex; align-items:center; justify-content:center;
+    }
+    .bonus-logo-wrap img {
+      display:block; width:auto; max-width:none; object-fit:contain;
+    }
+    .bonus-platform-desc {
+      font-family:'DM Sans',sans-serif; font-size:13px; color:#5A7050; margin-top:-4px;
+    }
+    .bonus-box {
+      background:rgba(0,0,0,0.25); border:1px solid rgba(212,168,67,0.12);
+      border-radius:14px; padding:20px 22px;
+    }
+    .bonus-box-label {
+      font-family:'Oswald',sans-serif; font-size:10px; font-weight:600;
+      color:#4A6040; letter-spacing:2.5px; text-transform:uppercase; margin-bottom:14px;
+      display:block;
+    }
+    .bonus-amount-row { display:flex; align-items:baseline; gap:10px; margin-bottom:20px; line-height:1; }
+    .bonus-amount {
+      font-family:'Oswald',sans-serif; font-size:44px; font-weight:700;
+      color:#F0C75E; line-height:1; letter-spacing:0.5px;
+    }
+    .bonus-amount-suffix {
+      font-family:'Oswald',sans-serif; font-size:14px; font-weight:700;
+      color:#6E8060; letter-spacing:2px; text-transform:uppercase;
+    }
+    .bonus-features { display:flex; flex-direction:column; gap:10px; }
+    .bonus-feature {
+      display:flex; align-items:center; gap:10px;
+      font-family:'DM Sans',sans-serif; font-size:13px; color:#9AB880; font-weight:500;
+    }
+    .bonus-feature::before {
+      content:''; display:block; width:18px; height:18px; flex-shrink:0;
+      border-radius:50%; background:rgba(212,168,67,0.12); border:1.5px solid rgba(212,168,67,0.3);
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 18 18' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='9' cy='9' r='9' fill='none'/%3E%3Cpath d='M5 9l3 3 5-5' stroke='%23D4A843' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+      background-size:contain; background-repeat:no-repeat;
+    }
+    .bonus-cta-btn {
+      display:block; text-align:center; width:100%;
+      background:#D4A843; color:#0a0800;
+      font-family:'Oswald',sans-serif; font-size:15px; font-weight:700;
+      letter-spacing:1.5px; text-transform:uppercase;
+      padding:15px 24px; border-radius:10px; text-decoration:none;
+      box-shadow:0 4px 20px rgba(212,168,67,0.35); transition:all 0.2s;
+      margin-top:auto;
+    }
+    .bonus-cta-btn:hover { background:#F0C75E; transform:translateY(-2px); box-shadow:0 8px 30px rgba(212,168,67,0.45); }
+    .bonus-note {
+      font-family:'DM Sans',sans-serif; font-size:11px; color:#3A5030;
+      text-align:center; line-height:1.5;
+    }
+
+    /* ── Leaderboard section ── */
+    #leaderboard {
+      position: relative; z-index: 1; padding: 72px 48px 88px; overflow: hidden;
+      background: rgba(6,16,9,0.82);
+    }
+    .lb-glow-gold {
+      position: absolute; top: -20%; right: -5%; width: 55%; height: 90%;
+      background: radial-gradient(ellipse at 80% 30%, rgba(212,168,67,0.09) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .lb-glow-green {
+      position: absolute; bottom: -10%; left: -5%; width: 50%; height: 70%;
+      background: radial-gradient(ellipse at 10% 80%, rgba(27,107,46,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .lb-inner {
+      max-width: 1100px; margin: 0 auto;
+      position: relative; z-index: 1;
+    }
+    .lb-title {
+      font-family: 'LaTequila', 'Oswald', sans-serif; font-size: clamp(14px, 1.8vw, 26px); font-weight: normal;
+      line-height: 1; letter-spacing: 0; margin-bottom: 20px;
+      display: block;
+    }
+    .lb-body {
+      display: grid; grid-template-columns: 1fr 1.6fr; gap: 48px; align-items: center;
+    }
+    .lb-title-gold { color: #D4A843; text-shadow: 2px 2px 0 rgba(0,0,0,0.5), 0 2px 24px rgba(212,168,67,0.4); }
+    .lb-title-white { color: #F0ECD8; text-shadow: 2px 2px 0 rgba(0,0,0,0.5); }
+    .lb-sub {
+      font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600;
+      color: #888880; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 28px;
+    }
+    .lb-sub span { color: #F0C75E; }
+    .lb-logos { display: flex; align-items: center; gap: 14px; margin-bottom: 36px; }
+    .lb-logo-text {
+      font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 600;
+      color: #FAFAF7; letter-spacing: 0.5px; font-style: italic;
+    }
+    .lb-logo-us { font-size: 13px; font-style: normal; color: #999990; }
+    .lb-logo-sep { color: rgba(212,168,67,0.35); font-size: 26px; font-weight: 300; }
+    .lb-cta {
+      display: inline-block; background: #D4A843; color: #141414;
+      font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
+      padding: 13px 40px; border-radius: 8px; text-decoration: none;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      box-shadow: 0 4px 24px rgba(212,168,67,0.35); transition: all 0.2s;
+    }
+    .lb-cta:hover { background: #F0C75E; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(212,168,67,0.45); }
+
+    /* Cards */
+    .lb-cards { display: flex; align-items: flex-end; justify-content: center; gap: 14px; }
+    .lb-card {
+      background: linear-gradient(160deg, #0d2614 0%, #091808 100%);
+      border: 1.5px solid rgba(212,168,67,0.2);
+      border-radius: 18px; padding: 22px 18px 26px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      width: 155px; position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(212,168,67,0.08);
+      transition: transform 0.3s ease;
+    }
+    .lb-card:hover { transform: translateY(-5px); }
+    .lb-card.featured {
+      width: 178px; padding: 28px 22px 32px;
+      border-color: rgba(212,168,67,0.45);
+      background: linear-gradient(160deg, #163320 0%, #0d2010 100%);
+      box-shadow: 0 16px 52px rgba(0,0,0,0.55), 0 0 36px rgba(212,168,67,0.13), inset 0 1px 0 rgba(212,168,67,0.18);
+    }
+    .lb-rank-badge {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .lb-rank-badge.gold   { background: #D4A843; color: #0a0600; box-shadow: 0 2px 14px rgba(212,168,67,0.55); }
+    .lb-rank-badge.silver { background: #9EAAB4; color: #0a0a0a; }
+    .lb-rank-badge.bronze { background: #C17B3A; color: #0a0400; }
+    .lb-card.featured .lb-rank-badge { width: 40px; height: 40px; font-size: 18px; }
+    .lb-avatar {
+      width: 62px; height: 62px; border-radius: 50%;
+      background: linear-gradient(135deg, #1B6B2E 0%, #234A18 100%);
+      border: 2px solid rgba(212,168,67,0.28);
+    }
+    .lb-card.featured .lb-avatar { width: 74px; height: 74px; border-color: rgba(212,168,67,0.5); }
+    .lb-card-divider { width: 40%; height: 1px; background: rgba(212,168,67,0.18); }
+    .lb-username {
+      font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
+      color: #FAFAF7; letter-spacing: 1px; text-transform: uppercase; text-align: center;
+    }
+    .lb-card.featured .lb-username { font-size: 17px; }
+    .lb-wagered-label {
+      font-family: 'DM Sans', sans-serif; font-size: 10px; color: #5A7050;
+      text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    .lb-wagered-amt {
+      font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700; color: #F0C75E;
+    }
+    .lb-card.featured .lb-wagered-amt { font-size: 19px; }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 1;
+      background: rgba(6,14,8,0.92); border-top: 1px solid rgba(212,168,67,0.1);
+      backdrop-filter: blur(4px);
+    }
+    .footer-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+
+    /* Main row */
+    .footer-main {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px; gap: 32px; flex-wrap: wrap;
+    }
+    .footer-logo { height: 40px; display: block; flex-shrink: 0; }
+
+    /* Inline nav links */
+    .footer-nav { display: flex; gap: 24px; align-items: center; }
+    .footer-link {
+      font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 600;
+      color: #5A5A52; text-decoration: none; letter-spacing: 1.2px; text-transform: uppercase;
+      transition: color 0.15s;
+    }
+    .footer-link:hover { color: #F0C75E; }
+
+    /* Social icons row */
+    .footer-socials { display: flex; gap: 10px; align-items: center; }
+    .social-icon {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 8px; text-decoration: none;
+      border: 1px solid transparent; transition: all 0.2s; font-size: 15px;
+    }
+    .social-icon.kick    { background: rgba(83,252,24,0.07);  border-color: rgba(83,252,24,0.15);  color: #53FC18; }
+    .social-icon.discord { background: rgba(88,101,242,0.07); border-color: rgba(88,101,242,0.15); color: #7289DA; }
+    .social-icon.youtube { background: rgba(255,0,0,0.06);    border-color: rgba(255,0,0,0.12);    color: #FF4444; }
+    .social-icon.twitter { background: rgba(255,255,255,0.04);border-color: rgba(255,255,255,0.08);color: #888880; }
+    .social-icon:hover { transform: translateY(-2px); filter: brightness(1.2); }
+
+    /* Bottom bar */
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.05); padding: 10px 48px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-copy { font-family: 'DM Sans', sans-serif; font-size: 11px; color: #3A3A34; }
+    .footer-disclaimer { font-family: 'DM Sans', sans-serif; font-size: 10px; color: #3A3A34; max-width: 600px; }
+    .footer-badge {
+      font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 600;
+      color: #3A3A34; letter-spacing: 1.5px; text-transform: uppercase;
+      background: rgba(212,168,67,0.05); padding: 3px 10px; border-radius: 20px;
+      border: 1px solid rgba(212,168,67,0.08); flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Fixed page atmosphere -->
+<div id="page-bg">
+  <div class="pg-sunset"></div>
+  <div class="pg-green"></div>
+  <div class="pg-horizon"></div>
+  <div class="pg-texture"></div>
+  <div class="pg-motif"></div>
+  <div class="pg-star" style="width:3px;height:3px;top:8%;left:12%;animation-delay:0s;animation-duration:4s;opacity:0.1"></div>
+  <div class="pg-star" style="width:2px;height:2px;top:15%;left:70%;animation-delay:1.2s;animation-duration:3s;opacity:0.08"></div>
+  <div class="pg-star" style="width:3px;height:3px;top:30%;left:88%;animation-delay:2s;animation-duration:5s;opacity:0.09"></div>
+  <div class="pg-star" style="width:2px;height:2px;top:55%;left:5%;animation-delay:0.5s;animation-duration:3.5s;opacity:0.07"></div>
+  <div class="pg-star" style="width:4px;height:4px;top:72%;left:55%;animation-delay:1.8s;animation-duration:4.5s;opacity:0.06"></div>
+  <div class="pg-star" style="width:2px;height:2px;top:85%;left:30%;animation-delay:0.8s;animation-duration:3.2s;opacity:0.08"></div>
+  <!-- Desert landscape fixed behind everything -->
+  <svg viewBox="0 0 1440 180" style="position:absolute;bottom:0;left:0;width:100%;height:180px" preserveAspectRatio="none">
+    <path d="M0,180 L0,130 Q100,95 200,112 Q350,75 500,100 Q650,62 800,88 Q950,52 1100,78 Q1250,48 1440,70 L1440,180Z" fill="rgba(8,20,10,0.45)"/>
+    <path d="M0,180 L0,155 Q80,135 160,145 Q240,125 360,138 Q480,118 600,134 Q720,114 840,130 Q960,110 1080,126 Q1200,108 1440,122 L1440,180Z" fill="rgba(10,26,13,0.5)"/>
+    <g fill="rgba(7,18,9,0.65)">
+      <rect x="80" y="112" width="10" height="58" rx="5"/>
+      <rect x="68" y="126" width="9" height="24" rx="4.5" transform="rotate(-18 73 138)"/>
+      <rect x="92" y="119" width="8" height="20" rx="4" transform="rotate(16 96 129)"/>
+      <rect x="700" y="88" width="12" height="70" rx="6"/>
+      <rect x="686" y="105" width="10" height="28" rx="5" transform="rotate(-15 691 119)"/>
+      <rect x="714" y="97" width="9" height="24" rx="4.5" transform="rotate(18 718 109)"/>
+      <rect x="1280" y="70" width="11" height="72" rx="5.5"/>
+      <rect x="1268" y="87" width="9" height="26" rx="4.5" transform="rotate(-14 1272 100)"/>
+      <rect x="1293" y="79" width="8" height="22" rx="4" transform="rotate(16 1297 90)"/>
+      <rect x="350" y="128" width="6" height="34" rx="3"/>
+      <rect x="344" y="137" width="6" height="15" rx="3" transform="rotate(-20 347 144)"/>
+      <rect x="950" y="110" width="7" height="40" rx="3.5"/>
+      <rect x="944" y="120" width="6" height="17" rx="3" transform="rotate(-16 947 128)"/>
+    </g>
+  </svg>
+  <div class="pg-vignette"></div>
+</div>
+
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar">
+  <div class="nav-left">
+    <img src="uploads/pasted-1777425494211-0.png" alt="BigJuan" class="nav-logo" />
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#bonuses">Bonuses</a>
+      <a href="leaderboard.html">Leaderboard</a>
+    </div>
+  </div>
+  <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="nav-cta">Claim Bonus</a>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section id="home">
+  <div class="hero-sun-outer"></div>
+  <div class="hero-sun-ring"></div>
+  <div class="hero-sun-ring2"></div>
+
+  <!-- Papel picado -->
+  <svg class="papel-picado" viewBox="0 0 1440 32" preserveAspectRatio="none">
+    <path d="M0,0 L0,16 Q10,24 20,16 L20,28 Q30,32 40,28 L40,16 Q50,24 60,16 L60,28 Q70,32 80,28 L80,16 Q90,24 100,16 L100,28 Q110,32 120,28 L120,16 Q130,24 140,16 L140,28 Q150,32 160,28 L160,16 Q170,24 180,16 L180,28 Q190,32 200,28 L200,16 Q210,24 220,16 L220,28 Q230,32 240,28 L240,16 Q250,24 260,16 L260,28 Q270,32 280,28 L280,16 Q290,24 300,16 L300,28 Q310,32 320,28 L320,16 Q330,24 340,16 L340,28 Q350,32 360,28 L360,16 Q370,24 380,16 L380,28 Q390,32 400,28 L400,16 Q410,24 420,16 L420,28 Q430,32 440,28 L440,16 Q450,24 460,16 L460,28 Q470,32 480,28 L480,16 Q490,24 500,16 L500,28 Q510,32 520,28 L520,16 Q530,24 540,16 L540,28 Q550,32 560,28 L560,16 Q570,24 580,16 L580,28 Q590,32 600,28 L600,16 Q610,24 620,16 L620,0Z M620,0 L620,16 Q630,24 640,16 L640,28 Q650,32 660,28 L660,16 Q670,24 680,16 L680,28 Q690,32 700,28 L700,16 Q710,24 720,16 L720,28 Q730,32 740,28 L740,16 Q750,24 760,16 L760,28 Q770,32 780,28 L780,16 Q790,24 800,16 L800,0Z M800,0 L800,16 Q810,24 820,16 L820,28 Q830,32 840,28 L840,16 Q850,24 860,16 L860,28 Q870,32 880,28 L880,16 Q890,24 900,16 L900,28 Q910,32 920,28 L920,16 Q930,24 940,16 L940,28 Q950,32 960,28 L960,16 Q970,24 980,16 L980,0Z M980,0 L980,16 Q990,24 1000,16 L1000,28 Q1010,32 1020,28 L1020,16 Q1030,24 1040,16 L1040,28 Q1050,32 1060,28 L1060,16 Q1070,24 1080,16 L1080,28 Q1090,32 1100,28 L1100,16 Q1110,24 1120,16 L1120,28 Q1130,32 1140,28 L1140,16 Q1150,24 1160,16 L1160,0Z M1160,0 L1160,16 Q1170,24 1180,16 L1180,28 Q1190,32 1200,28 L1200,16 Q1210,24 1220,16 L1220,28 Q1230,32 1240,28 L1240,16 Q1250,24 1260,16 L1260,28 Q1270,32 1280,28 L1280,16 Q1290,24 1300,16 L1300,28 Q1310,32 1320,28 L1320,16 Q1330,24 1340,16 L1340,28 Q1350,32 1360,28 L1360,16 Q1370,24 1380,16 L1380,28 Q1390,32 1400,28 L1400,16 Q1410,24 1420,16 L1420,28 Q1430,32 1440,28 L1440,0Z" fill="#D4A843"/>
+  </svg>
+
+  <!-- Confetti -->
+  <div class="diamond" style="top:12%;left:15%;width:10px;height:10px;background:#D4A843;opacity:0.2;z-index:2"></div>
+  <div class="diamond" style="top:8%;right:22%;width:7px;height:7px;background:#F0C75E;opacity:0.15;z-index:2"></div>
+  <div class="diamond" style="top:35%;left:8%;width:6px;height:6px;background:#D4783A;opacity:0.18;z-index:2"></div>
+  <div class="diamond" style="top:20%;left:42%;width:5px;height:5px;background:#D4A843;opacity:0.12;z-index:2"></div>
+  <div class="diamond" style="bottom:30%;right:5%;width:8px;height:8px;background:#D4A843;opacity:0.14;z-index:2"></div>
+  <div class="diamond" style="top:55%;left:3%;width:5px;height:5px;background:#F5EFE0;opacity:0.1;z-index:2"></div>
+
+  <div class="hero-content">
+    <div class="hero-mascot-wrap">
+      <div class="mascot-glow-outer"></div>
+      <div class="mascot-halo"></div>
+      <img src="uploads/pasted-1777425494211-0.png" alt="BigJuan" class="hero-mascot" />
+      <div class="float-accent a"><img src="uploads/taco.png" alt="" /></div>
+      <div class="float-accent b"><img src="uploads/taco.png" alt="" /></div>
+      <div class="float-accent c"><img src="uploads/taco.png" alt="" /></div>
+      <div class="float-accent d"><img src="uploads/taco.png" alt="" /></div>
+    </div>
+
+    <p class="hero-tagline">Exclusive Rewards, Leaderboards &amp; Cash Prizes</p>
+    <h2 class="hero-headline">Start <span>Earning</span></h2>
+
+    <div class="hero-buttons">
+      <a href="#bonuses" class="btn-primary">Claim Bonus</a>
+      <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="btn-outline">Play on Stake</a>
+    </div>
+
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-val" data-count="5000" data-prefix="$" data-suffix="+">$0+</div>
+        <div class="hero-stat-label">Prize Pool</div>
+      </div>
+      <div>
+        <div class="hero-stat-val" data-count="500" data-suffix="+">0+</div>
+        <div class="hero-stat-label">Players</div>
+      </div>
+      <div>
+        <div class="hero-stat-val" data-count="120" data-suffix="+">0+</div>
+        <div class="hero-stat-label">Rewards Claimed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Cactus divider hero → bonuses -->
+<div class="cactus-divider" style="z-index:1;margin-top:-2px">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" style="height:80px">
+    <path d="M0,80 L0,50 Q80,28 160,42 Q280,16 440,34 Q600,10 760,28 Q920,6 1080,24 Q1240,4 1440,18 L1440,80Z" fill="rgba(8,18,10,0.7)"/>
+    <g fill="rgba(6,15,8,0.7)">
+      <rect x="200" y="22" width="9" height="40" rx="4.5"/>
+      <rect x="190" y="32" width="8" height="18" rx="4" transform="rotate(-18 194 41)"/>
+      <rect x="211" y="28" width="7" height="15" rx="3.5" transform="rotate(16 214 35)"/>
+      <rect x="580" y="10" width="10" height="46" rx="5"/>
+      <rect x="569" y="21" width="9" height="21" rx="4.5" transform="rotate(-15 573 31)"/>
+      <rect x="592" y="16" width="8" height="18" rx="4" transform="rotate(18 596 25)"/>
+      <rect x="1200" y="4" width="9" height="42" rx="4.5"/>
+      <rect x="1190" y="15" width="8" height="19" rx="4" transform="rotate(-14 1194 24)"/>
+      <rect x="1211" y="10" width="7" height="16" rx="3.5" transform="rotate(17 1214 18)"/>
+    </g>
+  </svg>
+</div>
+
+<!-- ===== BONUSES ===== -->
+<section id="bonuses">
+  <div class="sec-motif"></div>
+  <div class="sec-glow-gold-tr"></div>
+  <div class="sec-glow-green-bl"></div>
+
+  <!-- Papel picado strip -->
+  <svg class="sec-picado" viewBox="0 0 1440 24" preserveAspectRatio="none" style="height:24px">
+    <path d="M0,0 L0,12 Q12,18 24,12 L24,20 Q36,24 48,20 L48,12 Q60,18 72,12 L72,20 Q84,24 96,20 L96,12 Q108,18 120,12 L120,20 Q132,24 144,20 L144,12 Q156,18 168,12 L168,20 Q180,24 192,20 L192,12 Q204,18 216,12 L216,20 Q228,24 240,20 L240,12 Q252,18 264,12 L264,20 Q276,24 288,20 L288,12 Q300,18 312,12 L312,20 Q324,24 336,20 L336,12 Q348,18 360,12 L360,20 Q372,24 384,20 L384,12 Q396,18 408,12 L408,20 Q420,24 432,20 L432,12 Q444,18 456,12 L456,20 Q468,24 480,20 L480,12 Q492,18 504,12 L504,20 Q516,24 528,20 L528,12 Q540,18 552,12 L552,20 Q564,24 576,20 L576,12 Q588,18 600,12 L600,0Z M600,0 L600,12 Q612,18 624,12 L624,20 Q636,24 648,20 L648,12 Q660,18 672,12 L672,20 Q684,24 696,20 L696,12 Q708,18 720,12 L720,20 Q732,24 744,20 L744,12 Q756,18 768,12 L768,20 Q780,24 792,20 L792,12 Q804,18 816,12 L816,20 Q828,24 840,20 L840,0Z M840,0 L840,12 Q852,18 864,12 L864,20 Q876,24 888,20 L888,12 Q900,18 912,12 L912,20 Q924,24 936,20 L936,12 Q948,18 960,12 L960,20 Q972,24 984,20 L984,12 Q996,18 1008,12 L1008,0Z M1008,0 L1008,12 Q1020,18 1032,12 L1032,20 Q1044,24 1056,20 L1056,12 Q1068,18 1080,12 L1080,20 Q1092,24 1104,20 L1104,12 Q1116,18 1128,12 L1128,0Z M1128,0 L1128,12 Q1140,18 1152,12 L1152,20 Q1164,24 1176,20 L1176,12 Q1188,18 1200,12 L1200,20 Q1212,24 1224,20 L1224,12 Q1236,18 1248,12 L1248,0Z M1248,0 L1248,12 Q1260,18 1272,12 L1272,20 Q1284,24 1296,20 L1296,12 Q1308,18 1320,12 L1320,20 Q1332,24 1344,20 L1344,12 Q1356,18 1368,12 L1368,0Z M1368,0 L1368,12 Q1380,18 1392,12 L1392,20 Q1404,24 1416,20 L1416,12 Q1428,18 1440,12 L1440,0Z" fill="#D4A843"/>
+  </svg>
+
+  <!-- Side cactus accents -->
+  <svg class="side-cactus" style="left:0;width:72px;height:150px;opacity:0.1" viewBox="0 0 72 150">
+    <rect x="31" y="10" width="10" height="140" rx="5" fill="#D4A843"/>
+    <rect x="18" y="38" width="9" height="28" rx="4.5" fill="#D4A843" transform="rotate(-18 22 52)"/>
+    <rect x="43" y="30" width="8" height="24" rx="4" fill="#D4A843" transform="rotate(17 47 42)"/>
+  </svg>
+  <svg class="side-cactus" style="right:0;width:58px;height:120px;opacity:0.09" viewBox="0 0 58 120">
+    <rect x="24" y="8" width="9" height="112" rx="4.5" fill="#D4A843"/>
+    <rect x="12" y="30" width="8" height="24" rx="4" fill="#D4A843" transform="rotate(-20 16 42)"/>
+    <rect x="34" y="24" width="7" height="20" rx="3.5" fill="#D4A843" transform="rotate(17 37 34)"/>
+  </svg>
+
+  <!-- Scattered diamonds -->
+  <div class="diamond" style="top:10%;right:7%;width:8px;height:8px;background:#D4A843;opacity:0.14"></div>
+  <div class="diamond" style="bottom:14%;left:5%;width:6px;height:6px;background:#F0C75E;opacity:0.11"></div>
+  <div class="diamond" style="top:55%;left:48%;width:5px;height:5px;background:#D4783A;opacity:0.09"></div>
+  <div class="diamond" style="top:30%;right:12%;width:5px;height:5px;background:#F0C75E;opacity:0.08"></div>
+
+  <!-- BONUSES heading -->
+  <div class="bonuses-heading">
+    <img src="uploads/bonuses.png" alt="BONUSES" />
+  </div>
+
+  <!-- Bonus Cards -->
+  <div class="bonus-cards-grid">
+
+    <!-- Stake.US -->
+    <div class="bonus-card-outer">
+      <div class="bonus-card-top">
+        <div class="bonus-region-badge">🇺🇸 US Players Only</div>
+      </div>
+      <div class="bonus-logo-wrap">
+        <img src="uploads/stake-us.webp" alt="Stake.US" style="height:125px;filter:brightness(0) invert(1);" />
+      </div>
+      <div class="bonus-platform-desc">America's premier social casino experience.</div>
+      <div class="bonus-box">
+        <div class="bonus-box-label">Exclusive Bonus</div>
+        <div class="bonus-amount-row">
+          <span class="bonus-amount">25sc</span>
+          <span class="bonus-amount-suffix">Free</span>
+        </div>
+        <div class="bonus-features">
+          <div class="bonus-feature">1sc Daily</div>
+          <div class="bonus-feature">5% rakeback</div>
+          <div class="bonus-feature">Leaderboard Access</div>
+          <div class="bonus-feature">No deposit required</div>
+        </div>
+      </div>
+      <a href="https://stake.us/?c=Risky" target="_blank" rel="noopener" class="bonus-cta-btn">Claim 25SC Free Now ↗</a>
+      <div class="bonus-note">1SC can be redeemed for the equivalent of $1 USD</div>
+    </div>
+
+    <!-- Stake.com -->
+    <div class="bonus-card-outer">
+      <div class="bonus-card-top">
+        <div class="bonus-region-badge">🌐 International Players</div>
+      </div>
+      <div class="bonus-logo-wrap">
+        <img src="uploads/stake-logo-white.png" alt="Stake" style="height:54px;" />
+      </div>
+      <div class="bonus-platform-desc">The world's leading crypto casino.</div>
+      <div class="bonus-box">
+        <div class="bonus-box-label">Exclusive Bonus</div>
+        <div class="bonus-amount-row">
+          <span class="bonus-amount">$50</span>
+          <span class="bonus-amount-suffix">Bonus</span>
+        </div>
+        <div class="bonus-features">
+          <div class="bonus-feature">5% rakeback</div>
+          <div class="bonus-feature">Leaderboard Access</div>
+          <div class="bonus-feature">Requires $50+ deposit</div>
+          <div class="bonus-feature">Requires $1,000+ wagered within 3 days of sign up</div>
+        </div>
+      </div>
+      <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="bonus-cta-btn">Claim $50 Bonus ↗</a>
+      <div class="bonus-note">Create a Discord ticket to claim the sign up bonus</div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- Cactus divider bonuses → leaderboard -->
+<div class="cactus-divider" style="z-index:1">
+  <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style="height:60px">
+    <path d="M0,60 L0,36 Q100,14 220,28 Q380,8 560,22 Q720,4 880,18 Q1040,2 1200,14 Q1320,4 1440,10 L1440,60Z" fill="rgba(6,16,9,0.82)"/>
+    <g fill="rgba(5,14,7,0.7)">
+      <rect x="320" y="10" width="8" height="32" rx="4"/>
+      <rect x="311" y="20" width="7" height="14" rx="3.5" transform="rotate(-17 314 27)"/>
+      <rect x="330" y="15" width="6" height="12" rx="3" transform="rotate(16 333 21)"/>
+      <rect x="880" y="4" width="9" height="36" rx="4.5"/>
+      <rect x="870" y="14" width="8" height="16" rx="4" transform="rotate(-15 874 22)"/>
+      <rect x="891" y="9" width="7" height="14" rx="3.5" transform="rotate(17 894 16)"/>
+    </g>
+  </svg>
+</div>
+
+<!-- ===== LEADERBOARD ===== -->
+<section id="leaderboard">
+  <div class="lb-glow-gold"></div>
+  <div class="lb-glow-green"></div>
+
+  <div class="lb-inner">
+    <!-- Full-width title -->
+    <h2 class="lb-title">
+      <span class="lb-title-gold">LEADER</span><span class="lb-title-white">BOARD</span>
+    </h2>
+
+    <div class="lb-body">
+      <!-- Left: info -->
+      <div class="lb-left">
+        <p class="lb-sub">Climb the ranks. <span>Win real rewards.</span></p>
+        <div class="lb-logos">
+          <img src="uploads/stake-logo-white.png" alt="Stake" style="height:32px;" />
+          <span class="lb-logo-sep">|</span>
+          <img src="uploads/stake-us.webp" alt="Stake.US" style="height:80px;filter:brightness(0) invert(1);" />
+        </div>
+        <a href="leaderboard.html" class="lb-cta">Join Now</a>
+      </div>
+
+      <!-- Right: player cards -->
+      <div class="lb-cards">
+      <!-- 2nd place -->
+      <div class="lb-card">
+        <div class="lb-rank-badge silver">2</div>
+        <div class="lb-avatar"></div>
+        <div class="lb-card-divider"></div>
+        <div class="lb-username">SHOOTER24</div>
+        <div class="lb-wagered-label">Wagered</div>
+        <div class="lb-wagered-amt">$75,500.10</div>
+      </div>
+      <!-- 1st place (featured) -->
+      <div class="lb-card featured">
+        <div class="lb-rank-badge gold">1</div>
+        <div class="lb-avatar"></div>
+        <div class="lb-card-divider"></div>
+        <div class="lb-username">MR.JUAN</div>
+        <div class="lb-wagered-label">Wagered</div>
+        <div class="lb-wagered-amt">$150,000.25</div>
+      </div>
+      <!-- 3rd place -->
+      <div class="lb-card">
+        <div class="lb-rank-badge bronze">3</div>
+        <div class="lb-avatar"></div>
+        <div class="lb-card-divider"></div>
+        <div class="lb-username">ZYNX1337</div>
+        <div class="lb-wagered-label">Wagered</div>
+        <div class="lb-wagered-amt">$45,250.75</div>
+      </div>
+    </div><!-- /.lb-body -->
+  </div><!-- /.lb-inner -->
+</section>
+
+<!-- Cactus divider leaderboard → footer -->
+<div class="cactus-divider" style="z-index:1">
+  <svg viewBox="0 0 1440 50" preserveAspectRatio="none" style="height:50px">
+    <path d="M0,50 L0,30 Q120,10 280,22 Q460,6 640,18 Q820,4 1000,16 Q1180,3 1440,12 L1440,50Z" fill="rgba(6,14,8,0.88)"/>
+    <g fill="rgba(5,12,7,0.65)">
+      <rect x="150" y="8" width="7" height="28" rx="3.5"/>
+      <rect x="143" y="16" width="6" height="12" rx="3" transform="rotate(-16 146 22)"/>
+      <rect x="159" y="12" width="5" height="10" rx="2.5" transform="rotate(15 161 17)"/>
+      <rect x="1050" y="4" width="8" height="30" rx="4"/>
+      <rect x="1042" y="13" width="7" height="13" rx="3.5" transform="rotate(-14 1045 19)"/>
+      <rect x="1060" y="8" width="6" height="11" rx="3" transform="rotate(16 1063 13)"/>
+    </g>
+  </svg>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-inner">
+    <!-- Main row: logo + nav + socials -->
+    <div class="footer-main">
+      <img src="uploads/pasted-1777425494211-0.png" alt="BigJuan" class="footer-logo" />
+
+      <nav class="footer-nav">
+        <a href="#home" class="footer-link">Home</a>
+        <a href="#bonuses" class="footer-link">Bonuses</a>
+        <a href="leaderboard.html" class="footer-link">Leaderboard</a>
+        <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="footer-link">Stake</a>
+        <a href="https://stake.us/?c=Risky" target="_blank" rel="noopener" class="footer-link">Stake.US</a>
+      </nav>
+
+      <div class="footer-socials">
+        <a href="https://kick.com/bigjuan" target="_blank" rel="noopener" class="social-icon kick" title="Kick">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M2 2h4v6.5L10.5 2H16l-6 8 6 12h-5.5L7 14.5 6 16v6H2V2z"/></svg>
+        </a>
+        <a href="#" class="social-icon discord" title="Discord">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.024.017.043.033.054a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        </a>
+        <a href="#" class="social-icon youtube" title="YouTube">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a href="#" class="social-icon twitter" title="X (Twitter)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 BigJuan. All rights reserved.</span>
+      <span class="footer-disclaimer">Not responsible for losses. Must be 18+ to participate.</span>
+      <span class="footer-badge">18+ · Gamble Responsibly</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 30);
+  });
+
+  // Stat counters
+  function animateCounters() {
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const target = parseInt(el.dataset.count);
+      const prefix = el.dataset.prefix || '';
+      const suffix = el.dataset.suffix || '';
+      let current = 0;
+      const step = Math.ceil(target / 40);
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = prefix + current.toLocaleString() + suffix;
+        if (current >= target) clearInterval(timer);
+      }, 30);
+    });
+  }
+  const heroObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) { animateCounters(); heroObs.disconnect(); }
+  }, { threshold: 0.3 });
+  heroObs.observe(document.getElementById('home'));
+</script>
+</body>
+</html>
