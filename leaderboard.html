@@ -606,10 +606,87 @@
 </footer>
 
 <script>
-  function switchTab(e, platform) {
+  const STAKEUS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-RkYbDayFFj7M173iNf1wIR00qduIPuSox3EMAr95ak/gviz/tq?tqx=out:csv&gid=235680015';
+  let stakeUSDataCache = null;
+
+  function parseCSV(csv) {
+    return csv.split('\n').filter(l => l.trim()).map(line => {
+      const fields = [];
+      let current = '', inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          fields.push(current); current = '';
+        } else current += ch;
+      }
+      fields.push(current);
+      return fields;
+    });
+  }
+
+  async function fetchStakeUSData() {
+    if (stakeUSDataCache) return stakeUSDataCache;
+    try {
+      const res = await fetch(STAKEUS_CSV_URL);
+      const text = await res.text();
+      const rows = parseCSV(text);
+      const data = rows.slice(1).map(r => ({
+        username: r[2],
+        wagered: r[3],
+        rank: parseInt(r[4], 10)
+      })).filter(d => d.username && !isNaN(d.rank));
+      stakeUSDataCache = data;
+      return data;
+    } catch (err) {
+      console.error('Failed to load Stake.US data:', err);
+      return null;
+    }
+  }
+
+  function renderPlaceholders() {
+    document.querySelectorAll('.podium-name').forEach(el => el.textContent = 'This could be you');
+    document.querySelectorAll('.podium-wagered-val').forEach(el => el.textContent = '---');
+    document.querySelectorAll('.lb-table-wrap .row-name').forEach(el => el.textContent = 'This could be you');
+    document.querySelectorAll('.lb-table-wrap .row-wagered').forEach(el => el.textContent = '---');
+  }
+
+  function renderStakeUS(data) {
+    const podiumOrder = [
+      { sel: '.podium-slot.first',  rank: 1 },
+      { sel: '.podium-slot.second', rank: 2 },
+      { sel: '.podium-slot.third',  rank: 3 }
+    ];
+    podiumOrder.forEach(({ sel, rank }) => {
+      const slot = document.querySelector(sel);
+      if (!slot) return;
+      const p = data.find(d => d.rank === rank);
+      slot.querySelector('.podium-name').textContent = p ? p.username : 'This could be you';
+      slot.querySelector('.podium-wagered-val').textContent = p ? p.wagered : '---';
+    });
+    const rows = document.querySelectorAll('.lb-table-wrap .lb-row');
+    rows.forEach((row, i) => {
+      const p = data.find(d => d.rank === (i + 1));
+      const nameEl = row.querySelector('.row-name');
+      const wagEl = row.querySelector('.row-wagered');
+      if (nameEl) nameEl.textContent = p ? p.username : 'This could be you';
+      if (wagEl)  wagEl.textContent  = p ? p.wagered : '---';
+    });
+  }
+
+  async function switchTab(e, platform) {
     e.preventDefault();
     document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
     e.currentTarget.classList.add('active');
+    if (platform === 'stakeus') {
+      const data = await fetchStakeUSData();
+      if (data && data.length) renderStakeUS(data);
+      else renderPlaceholders();
+    } else {
+      renderPlaceholders();
+    }
   }
 
   const END_DATE = new Date('2026-06-01T00:00:00');
