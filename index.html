@@ -499,6 +499,67 @@
       font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 500;
       color: #5A5A52; letter-spacing: 1px; line-height: 1.6; text-transform: uppercase;
     }
+
+    /* ════════════ Responsive / mobile ════════════ */
+    @media (max-width: 860px) {
+      nav#navbar { padding: 0 20px; }
+      .nav-left { gap: 18px; }
+      .nav-links { gap: 18px; }
+
+      #home { padding: 96px 20px 0; }
+      #bonuses { padding: 0 20px 70px; }
+      #leaderboard { padding: 60px 20px 72px; }
+
+      .lb-body { grid-template-columns: 1fr; gap: 36px; }
+      .lb-left { text-align: center; }
+      .lb-logos { justify-content: center; }
+
+      .footer-main { grid-template-columns: 1fr; gap: 28px; padding: 36px 24px 24px; }
+      .footer-brand { align-items: center; margin-left: 0; }
+      .footer-nav { align-items: center; }
+      .footer-socials { justify-content: center; }
+      .footer-disclaimer-row { margin: 0 24px 24px; }
+    }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .nav-logo { height: 40px; }
+      .nav-cta { padding: 9px 18px; font-size: 12px; }
+
+      .hero-tagline { font-size: 12px; letter-spacing: 1.6px; }
+      .hero-headline { font-size: 32px; letter-spacing: 2px; margin-bottom: 26px; }
+
+      .hero-mascot { width: 230px; }
+      .mascot-glow-outer { width: 300px; height: 300px; }
+      .mascot-halo { width: 250px; height: 250px; }
+      .hero-sun-outer { width: 300px; height: 300px; }
+      .hero-sun-ring { width: 240px; height: 240px; }
+      .hero-sun-ring2 { width: 180px; height: 180px; }
+      .float-accent.a img { width: 48px; }
+      .float-accent.b img { width: 40px; }
+      .float-accent.c img { width: 34px; }
+      .float-accent.d img { width: 32px; }
+
+      .hero-buttons { flex-direction: column; align-items: stretch; width: 100%; max-width: 300px; gap: 12px; margin-bottom: 36px; }
+      .btn-primary, .btn-outline { width: 100%; text-align: center; padding: 14px 24px; }
+
+      .hero-stats { gap: 22px; flex-wrap: wrap; justify-content: center; }
+      .hero-stat-val { font-size: 20px; }
+
+      .bonuses-heading { margin-bottom: -20px; }
+      .bonus-cards-grid { flex-direction: column; align-items: center; gap: 20px; }
+      .bonus-card-outer { width: 100%; max-width: 420px; }
+
+      .lb-cards { gap: 8px; }
+      .lb-card { width: auto; flex: 1 1 0; min-width: 0; padding: 16px 8px 20px; }
+      .lb-card.featured { width: auto; padding: 20px 10px 24px; }
+      .lb-avatar { width: 48px; height: 48px; }
+      .lb-card.featured .lb-avatar { width: 56px; height: 56px; }
+      .lb-username { font-size: 12px; letter-spacing: 0.5px; }
+      .lb-card.featured .lb-username { font-size: 13px; }
+      .lb-wagered-amt { font-size: 13px; }
+      .lb-card.featured .lb-wagered-amt { font-size: 14px; }
+    }
   </style>
 </head>
 <body>

@@ -371,6 +371,55 @@
       font-family:'Oswald',sans-serif; font-size:10px; font-weight:500;
       color:#5A5A52; letter-spacing:1px; line-height:1.6; text-transform:uppercase;
     }
+
+    /* ════════════ Responsive / mobile ════════════ */
+    @media (max-width: 860px) {
+      nav#navbar { padding:0 20px; }
+      .nav-left { gap:18px; }
+      .nav-links { gap:18px; }
+
+      .lb-hero { padding:44px 20px 36px; }
+      .lb-tabs { padding:28px 20px 0; }
+      .lb-tab { width:auto; flex:1 1 0; max-width:200px; height:84px; }
+      .lb-content { padding:36px 20px 64px; }
+
+      .footer-main { grid-template-columns:1fr; gap:28px; padding:36px 24px 24px; }
+      .footer-brand { align-items:center; margin-left:0; }
+      .footer-nav { align-items:center; }
+      .footer-socials { justify-content:center; }
+      .footer-disclaimer-row { margin:0 24px 24px; }
+    }
+
+    @media (max-width: 600px) {
+      .nav-links { display:none; }
+      .nav-logo { height:40px; }
+      .nav-cta { padding:9px 18px; font-size:12px; }
+
+      .lb-tagline { font-size:14px; }
+      .lb-action-btns { flex-wrap:wrap; }
+
+      /* Stack podium, 1st place on top */
+      .lb-podium { flex-direction:column; align-items:center; gap:34px; }
+      .podium-slot.first { order:-1; }
+      .podium-card,
+      .podium-slot.first .podium-card { width:100%; max-width:300px; }
+
+      /* Countdown blocks fill the row evenly */
+      .lb-countdown { gap:8px; }
+      .cd-block { flex:1 1 0; min-width:0; padding:12px 6px; }
+      .cd-num { font-size:24px; }
+      .cd-label { font-size:9px; letter-spacing:1px; }
+
+      /* Prize table: drop the wagered column on small screens */
+      .lb-table-header { grid-template-columns:40px 1fr auto; }
+      .lb-row { grid-template-columns:40px 1fr auto; padding:12px 10px; }
+      .lb-table-header span:nth-child(3),
+      .row-wagered { display:none; }
+      .row-name { font-size:13px; }
+
+      .modal-box { padding:28px 22px; }
+      .modal-title { font-size:19px; }
+    }
   </style>
 </head>
 <body>
@@ -720,9 +769,13 @@
     }
   }
 
-  const END_DATE = new Date('2026-06-01T00:00:00');
+  // Always counts down to midnight on the 1st of the next month, then rolls over.
+  function nextMonthStart() {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0);
+  }
   function updateCountdown() {
-    const diff = END_DATE - Date.now();
+    const diff = nextMonthStart() - Date.now();
     if (diff <= 0) {
       ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => document.getElementById(id).textContent = '00');
       return;
