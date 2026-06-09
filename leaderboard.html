@@ -121,25 +121,6 @@
     }
     .lb-btn-rules:hover { border-color:#D4A843; color:#F0C75E; background:rgba(212,168,67,0.08); transform:translateY(-2px); }
 
-    /* ── Platform tabs ── */
-    .lb-tabs {
-      display:flex; justify-content:center; gap:12px;
-      padding:32px 48px 0; position:relative; z-index:1;
-    }
-    .lb-tab {
-      font-family:'Oswald',sans-serif; font-size:13px; font-weight:600;
-      letter-spacing:1.5px; text-transform:uppercase;
-      width:200px; height:100px; border-radius:8px; cursor:pointer; border:none;
-      transition:all 0.2s; text-decoration:none;
-      display:flex; align-items:center; justify-content:center;
-    }
-    .lb-tab img { height:26px; width:auto; display:block; }
-    .lb-tab:nth-child(2) img { height:68px; }
-    .lb-tab.active { background:#D4A843; color:#141414; }
-    .lb-tab.active:hover { box-shadow:0 0 0 2px rgba(255,255,255,0.55); }
-    .lb-tab:not(.active) { background:rgba(255,255,255,0.04); color:#888880; border:1px solid rgba(212,168,67,0.15); }
-    .lb-tab:not(.active):hover { border-color:rgba(212,168,67,0.35); color:#D4A843; }
-
     /* ── Main content ── */
     .lb-content { max-width:960px; margin:0 auto; padding:48px 32px 80px; }
 
@@ -377,8 +358,6 @@
       .nav-links { gap:18px; }
 
       .lb-hero { padding:44px 20px 36px; }
-      .lb-tabs { padding:28px 20px 0; }
-      .lb-tab { width:auto; flex:1 1 0; max-width:200px; height:84px; }
       .lb-content { padding:36px 20px 64px; }
 
       .footer-main { grid-template-columns:1fr; gap:28px; padding:36px 24px 24px; }
@@ -457,16 +436,6 @@
       <button class="lb-btn lb-btn-join" onclick="openModal('join')">📋 How to Join</button>
       <button class="lb-btn lb-btn-rules" onclick="openModal('rules')">⚖️ Rules</button>
     </div>
-  </div>
-
-  <!-- Platform tabs -->
-  <div class="lb-tabs">
-    <a href="#" class="lb-tab active" onclick="switchTab(event,'stake')">
-      <img src="uploads/stake-logo-white.png" alt="Stake" />
-    </a>
-    <a href="#" class="lb-tab" onclick="switchTab(event,'stakeus')">
-      <img src="uploads/stake-us.webp" alt="Stake.US" style="filter:brightness(0) invert(1);" />
-    </a>
   </div>
 
   <!-- Content -->
@@ -684,8 +653,7 @@
 </footer>
 
 <script>
-  const STAKEUS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-RkYbDayFFj7M173iNf1wIR00qduIPuSox3EMAr95ak/gviz/tq?tqx=out:csv&gid=235680015';
-  let stakeUSDataCache = null;
+  const LEADERBOARD_CSV_URL = 'https://docs.google.com/spreadsheets/d/1wDQXgId5e6aPydUQ284rI70_CWmo9f1lX-rOX52F0Wo/gviz/tq?tqx=out:csv&gid=588713177';
 
   function parseCSV(csv) {
     return csv.split('\n').filter(l => l.trim()).map(line => {
@@ -705,21 +673,18 @@
     });
   }
 
-  async function fetchStakeUSData() {
-    if (stakeUSDataCache) return stakeUSDataCache;
+  async function fetchLeaderboardData() {
     try {
-      const res = await fetch(STAKEUS_CSV_URL);
+      const res = await fetch(LEADERBOARD_CSV_URL);
       const text = await res.text();
       const rows = parseCSV(text);
-      const data = rows.slice(1).map(r => ({
+      return rows.slice(1).map(r => ({
         username: r[2],
         wagered: r[3],
         rank: parseInt(r[4], 10)
       })).filter(d => d.username && !isNaN(d.rank));
-      stakeUSDataCache = data;
-      return data;
     } catch (err) {
-      console.error('Failed to load Stake.US data:', err);
+      console.error('Failed to load leaderboard data:', err);
       return null;
     }
   }
@@ -731,7 +696,7 @@
     document.querySelectorAll('.lb-table-wrap .row-wagered').forEach(el => el.textContent = '---');
   }
 
-  function renderStakeUS(data) {
+  function renderLeaderboard(data) {
     const podiumOrder = [
       { sel: '.podium-slot.first',  rank: 1 },
       { sel: '.podium-slot.second', rank: 2 },
@@ -754,18 +719,11 @@
     });
   }
 
-  async function switchTab(e, platform) {
-    e.preventDefault();
-    document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
-    e.currentTarget.classList.add('active');
-    if (platform === 'stakeus') {
-      const data = await fetchStakeUSData();
-      if (data && data.length) renderStakeUS(data);
-      else renderPlaceholders();
-    } else {
-      renderPlaceholders();
-    }
-  }
+  (async function initLeaderboard() {
+    const data = await fetchLeaderboardData();
+    if (data && data.length) renderLeaderboard(data);
+    else renderPlaceholders();
+  })();
 
   // Always counts down to midnight on the 1st of the next month, then rolls over.
   function nextMonthStart() {
