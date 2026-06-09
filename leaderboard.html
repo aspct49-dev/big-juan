@@ -730,8 +730,9 @@
     }
   })();
 
-  // Countdown targets the leaderboard's End Date (UTC) from the sheet.
-  // Falls back to the 1st of next month until the sheet loads / if it fails.
+  // Countdown targets the leaderboard's End Date (UTC) from the sheet while it's
+  // still in the future. If that date has already passed (or fails to load), it
+  // falls back to the 1st of next month so the timer never sticks at zero.
   function nextMonthStart() {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0).getTime();
@@ -743,7 +744,7 @@
     const t = String(raw).trim().replace(' ', 'T');
     const iso = /[zZ]$|[+-]\d{2}:?\d{2}$/.test(t) ? t : t + 'Z';
     const ms = Date.parse(iso);
-    if (!isNaN(ms)) { countdownTarget = ms; updateCountdown(); }
+    if (!isNaN(ms) && ms > Date.now()) { countdownTarget = ms; updateCountdown(); }
   }
 
   function updateCountdown() {
