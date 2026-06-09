@@ -681,7 +681,8 @@
       return rows.slice(1).map(r => ({
         username: r[2],
         wagered: r[3],
-        rank: parseInt(r[4], 10)
+        rank: parseInt(r[4], 10),
+        endDate: r[6]
       })).filter(d => d.username && !isNaN(d.rank));
     } catch (err) {
       console.error('Failed to load leaderboard data:', err);
@@ -721,17 +722,32 @@
 
   (async function initLeaderboard() {
     const data = await fetchLeaderboardData();
-    if (data && data.length) renderLeaderboard(data);
-    else renderPlaceholders();
+    if (data && data.length) {
+      renderLeaderboard(data);
+      if (data[0].endDate) setCountdownEnd(data[0].endDate);
+    } else {
+      renderPlaceholders();
+    }
   })();
 
-  // Always counts down to midnight on the 1st of the next month, then rolls over.
+  // Countdown targets the leaderboard's End Date (UTC) from the sheet.
+  // Falls back to the 1st of next month until the sheet loads / if it fails.
   function nextMonthStart() {
     const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0);
+    return new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0).getTime();
   }
+  let countdownTarget = nextMonthStart();
+
+  function setCountdownEnd(raw) {
+    // Sheet format is "YYYY-MM-DD HH:MM:SS" in UTC — normalize and treat as UTC.
+    const t = String(raw).trim().replace(' ', 'T');
+    const iso = /[zZ]$|[+-]\d{2}:?\d{2}$/.test(t) ? t : t + 'Z';
+    const ms = Date.parse(iso);
+    if (!isNaN(ms)) { countdownTarget = ms; updateCountdown(); }
+  }
+
   function updateCountdown() {
-    const diff = nextMonthStart() - Date.now();
+    const diff = countdownTarget - Date.now();
     if (diff <= 0) {
       ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => document.getElementById(id).textContent = '00');
       return;
