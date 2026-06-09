@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 26 96 76" width="96" height="76" fill="none">
+  <defs>
+    <linearGradient id="g1body" x1="60" y1="28" x2="60" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7DD82"/>
+      <stop offset="0.5" stop-color="#E0B547"/>
+      <stop offset="1" stop-color="#B07E27"/>
+    </linearGradient>
+    <radialGradient id="g1hl" cx="47" cy="44" r="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- wings -->
+  <g stroke="#EBCB6B" stroke-width="5" stroke-linecap="round">
+    <line x1="80" y1="40" x2="103" y2="30"/>
+    <line x1="81" y1="44" x2="100" y2="38"/>
+    <line x1="82" y1="48" x2="96" y2="45"/>
+    <line x1="40" y1="40" x2="17" y2="30"/>
+    <line x1="39" y1="44" x2="20" y2="38"/>
+    <line x1="38" y1="48" x2="24" y2="45"/>
+  </g>
+  <!-- body -->
+  <path d="M60 30 L89.4 47 L89.4 81 L60 98 L30.6 81 L30.6 47 Z" fill="url(#g1body)" stroke="#8A5F1C" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M60 30 L89.4 47 L89.4 81 L60 98 L30.6 81 L30.6 47 Z" fill="url(#g1hl)"/>
+  <!-- inner rim -->
+  <path d="M60 38 L82.5 51 L82.5 77 L60 90 L37.5 77 L37.5 51 Z" stroke="#FFF3C8" stroke-opacity="0.45" stroke-width="2" stroke-linejoin="round"/>
+  <!-- number -->
+  <text x="61" y="79.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="40" fill="#7A4E12" fill-opacity="0.5">1</text>
+  <text x="60" y="78" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="40" fill="#FFF7E0">1</text>
+</svg>
