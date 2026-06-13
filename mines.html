@@ -216,6 +216,60 @@
     .res-row .mult { color:#9AB880; font-weight:600; }
     .res-row .pay  { color:#FAFAF7; text-align:right; }
     .res-row .prof { color:#3FBF6A; font-weight:700; text-align:right; }
+    .res-row.hl { background:rgba(212,168,67,0.16); box-shadow:inset 3px 0 0 #D4A843; }
+
+    /* Currency chips */
+    .cur-quick { display:flex; gap:8px; }
+    .cur-quick button {
+      flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(212,168,67,0.15);
+      color:#9AB880; font-family:'Oswald',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.5px;
+      padding:9px 0; border-radius:8px; cursor:pointer; transition:all 0.15s;
+    }
+    .cur-quick button:hover { border-color:rgba(212,168,67,0.4); color:#F0C75E; }
+    .cur-quick button.active { background:#D4A843; color:#0a0800; border-color:#D4A843; }
+
+    /* Next-tile highlight */
+    .next-tile {
+      display:flex; gap:14px; align-items:center; margin-bottom:18px;
+      background:linear-gradient(135deg, rgba(212,168,67,0.14), rgba(212,168,67,0.04));
+      border:1px solid rgba(212,168,67,0.32); border-radius:14px; padding:14px 18px;
+    }
+    .next-tile .nt-found, .next-tile .nt-next { display:flex; flex-direction:column; gap:8px; }
+    .next-tile .nt-next { margin-left:auto; text-align:right; align-items:flex-end; }
+    .nt-cap { font-family:'Oswald',sans-serif; font-size:10px; font-weight:600; color:#9AB880; letter-spacing:1.5px; text-transform:uppercase; }
+    .nt-step { display:flex; align-items:center; gap:10px; }
+    .nt-step button {
+      width:32px; height:32px; border-radius:8px; cursor:pointer;
+      background:rgba(255,255,255,0.05); border:1px solid rgba(212,168,67,0.25);
+      color:#F0C75E; font-family:'Oswald',sans-serif; font-size:18px; font-weight:700; transition:all 0.15s;
+    }
+    .nt-step button:hover { border-color:rgba(212,168,67,0.5); background:rgba(212,168,67,0.1); }
+    .nt-step #col-val { font-family:'Oswald',sans-serif; font-size:22px; font-weight:700; color:#FAFAF7; min-width:24px; text-align:center; }
+    .nt-mult { font-family:'Oswald',sans-serif; font-size:30px; font-weight:700; color:#F0C75E; line-height:1; }
+    .nt-gain { font-family:'Oswald',sans-serif; font-size:12px; color:#3FBF6A; font-weight:600; }
+
+    /* Full payout table */
+    .ptable-section { max-width:960px; margin:48px auto 0; }
+    .ptable-title { font-family:'LaTequila','Oswald',sans-serif; font-size:clamp(16px,2vw,28px); font-weight:normal; text-align:center; margin-bottom:8px; }
+    .ptable-title .gold  { color:#D4A843; text-shadow:2px 2px 0 rgba(0,0,0,0.5); }
+    .ptable-title .white { color:#F0ECD8; text-shadow:2px 2px 0 rgba(0,0,0,0.5); }
+    .ptable-sub { text-align:center; font-family:'DM Sans',sans-serif; font-size:13px; color:#888880; margin-bottom:20px; }
+    .ptable-sub strong { color:#F0C75E; font-weight:700; }
+    .ptable-scroll {
+      overflow:auto; max-height:620px; border:1px solid rgba(212,168,67,0.15);
+      border-radius:14px; background:rgba(0,0,0,0.25);
+    }
+    .ptable-scroll::-webkit-scrollbar { width:9px; height:9px; }
+    .ptable-scroll::-webkit-scrollbar-thumb { background:rgba(212,168,67,0.25); border-radius:5px; }
+    .ptable { border-collapse:separate; border-spacing:0; font-family:'Oswald',sans-serif; font-size:11px; white-space:nowrap; }
+    .ptable th, .ptable td { padding:6px 9px; text-align:center; border-right:1px solid rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.04); }
+    .ptable thead th { position:sticky; top:0; background:#E0364B; color:#fff; font-weight:700; z-index:2; }
+    .ptable thead th.corner { left:0; z-index:3; background:#0d2614; color:#5A7050; }
+    .ptable th.dcol { position:sticky; left:0; background:#2EA05A; color:#06140a; font-weight:700; z-index:1; }
+    .ptable td { color:#C8C8C0; background:rgba(8,20,12,0.55); }
+    .ptable td.empty { background:transparent; border-color:transparent; }
+    .ptable td.hl { background:rgba(212,168,67,0.22); color:#F7E6A8; font-weight:600; }
+    .ptable thead th.hl { background:#D4A843; color:#0a0800; }
 
     /* ── Footer ── */
     footer {
@@ -329,6 +383,16 @@
       <!-- Controls -->
       <div class="calc-card">
         <div class="control-group">
+          <div class="control-label"><span>Currency</span></div>
+          <div class="cur-quick" id="cur-quick">
+            <button type="button" data-cur="USD" class="active">$ USD</button>
+            <button type="button" data-cur="EUR">€ EUR</button>
+            <button type="button" data-cur="GBP">£ GBP</button>
+            <button type="button" data-cur="INR">₹ INR</button>
+          </div>
+        </div>
+
+        <div class="control-group">
           <div class="control-label"><span>Bet Amount</span></div>
           <div class="bet-field">
             <span class="cur">$</span>
@@ -361,6 +425,22 @@
 
       <!-- Results -->
       <div class="calc-card">
+        <div class="next-tile">
+          <div class="nt-found">
+            <span class="nt-cap">Diamonds found</span>
+            <div class="nt-step">
+              <button id="col-dec" type="button">−</button>
+              <span id="col-val">0</span>
+              <button id="col-inc" type="button">+</button>
+            </div>
+          </div>
+          <div class="nt-next">
+            <span class="nt-cap">Next tile pays</span>
+            <span class="nt-mult" id="nt-mult">1.03×</span>
+            <span class="nt-gain" id="nt-gain">+0.03×</span>
+          </div>
+        </div>
+
         <div class="calc-summary">
           <div class="sum-box"><div class="lbl">Gems</div><div class="num" id="sum-gems">22</div></div>
           <div class="sum-box"><div class="lbl">Max Multiplier</div><div class="num" id="sum-max">—</div></div>
@@ -378,6 +458,14 @@
       </div>
 
     </div>
+
+    <!-- Full payout table -->
+    <div class="ptable-section">
+      <h2 class="ptable-title"><span class="white">FULL PAYOUT </span><span class="gold">TABLE</span></h2>
+      <p class="ptable-sub">Every <strong>diamonds × mines</strong> multiplier. Your selected <strong id="ptable-mines">3</strong>-mine column is highlighted.</p>
+      <div class="ptable-scroll"><table class="ptable" id="ptable"></table></div>
+    </div>
+
   </div>
 </div>
 
@@ -430,6 +518,17 @@
   const sumGems = document.getElementById('sum-gems');
   const sumMax  = document.getElementById('sum-max');
   const sumPay  = document.getElementById('sum-payout');
+  const curSym  = document.querySelector('.bet-field .cur');
+  const colVal  = document.getElementById('col-val');
+  const ntMult  = document.getElementById('nt-mult');
+  const ntGain  = document.getElementById('nt-gain');
+  const ptable  = document.getElementById('ptable');
+  const ptableMines = document.getElementById('ptable-mines');
+
+  const CURRENCIES = { USD: '$', EUR: '€', GBP: '£', INR: '₹' };
+  let cur = 'USD';
+  let collected = 0;
+  let lastMines = -1;
 
   // n choose k
   function comb(n, k) {
@@ -449,9 +548,17 @@
     if (m >= 1000) return Math.round(m).toLocaleString('en-US') + '×';
     return m.toFixed(2) + '×';
   }
+  function fmtNum(m) {
+    if (m >= 1000) return Math.round(m).toLocaleString('en-US');
+    return m.toFixed(2);
+  }
   function fmtMoney(v) {
     const dec = v >= 100000 ? 0 : 2;
-    return '$' + v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    return CURRENCIES[cur] + v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  }
+  function fmtGrid(m) {
+    if (m >= 1000) return Math.round(m).toLocaleString('en-US');
+    return (Math.round(m * 100) / 100).toFixed(2);
   }
 
   function renderBoard(mines) {
@@ -476,11 +583,6 @@
     const mines = parseInt(minesEl.value, 10);
     const bet = Math.max(0, parseFloat(betEl.value) || 0);
     const gems = TILES - mines;
-
-    minesVal.textContent = mines;
-    minesEl.style.setProperty('--fill', ((mines - 1) / 23 * 100) + '%');
-    sumGems.textContent = gems;
-
     let rows = '';
     let lastMult = 1;
     for (let d = 1; d <= gems; d++) {
@@ -488,7 +590,7 @@
       lastMult = m;
       const payout = bet * m;
       const profit = payout - bet;
-      rows += '<div class="res-row">'
+      rows += '<div class="res-row" data-d="' + d + '">'
         + '<span class="dia">💎 ' + d + '</span>'
         + '<span class="mult">' + fmtMult(m) + '</span>'
         + '<span class="pay">' + fmtMoney(payout) + '</span>'
@@ -500,25 +602,85 @@
     sumPay.textContent = fmtMoney(bet * lastMult);
   }
 
-  let lastMines = -1;
-  function update(reshuffle) {
+  // Highlight the multiplier gain for the very next diamond
+  function renderNextTile() {
     const mines = parseInt(minesEl.value, 10);
-    if (reshuffle || mines !== lastMines) { renderBoard(mines); lastMines = mines; }
-    renderResults();
+    const gems = TILES - mines;
+    collected = Math.max(0, Math.min(collected, gems - 1));
+    colVal.textContent = collected;
+    const curM  = collected === 0 ? 1 : multiplier(mines, collected);
+    const nextM = multiplier(mines, collected + 1);
+    ntMult.textContent = fmtMult(nextM);
+    ntGain.textContent = '+' + fmtNum(nextM - curM) + '×  ·  ×' + (nextM / curM).toFixed(2) + ' step';
+    resultsEl.querySelectorAll('.res-row.hl').forEach(e => e.classList.remove('hl'));
+    const row = resultsEl.querySelector('.res-row[data-d="' + (collected + 1) + '"]');
+    if (row) row.classList.add('hl');
   }
 
-  minesEl.addEventListener('input', () => update(false));
-  betEl.addEventListener('input', () => renderResults());
+  // Build the full diamonds × mines reference grid once
+  function buildPayoutTable() {
+    let h = '<thead><tr><th class="corner">💎\\💣</th>';
+    for (let m = 1; m <= 24; m++) h += '<th data-m="' + m + '">' + m + '</th>';
+    h += '</tr></thead><tbody>';
+    for (let d = 1; d <= 24; d++) {
+      h += '<tr><th class="dcol">' + d + '</th>';
+      for (let m = 1; m <= 24; m++) {
+        if (d <= TILES - m) h += '<td data-m="' + m + '">' + fmtGrid(multiplier(m, d)) + '</td>';
+        else h += '<td class="empty"></td>';
+      }
+      h += '</tr>';
+    }
+    h += '</tbody>';
+    ptable.innerHTML = h;
+  }
+  function highlightColumn(mines) {
+    ptable.querySelectorAll('.hl').forEach(e => e.classList.remove('hl'));
+    ptable.querySelectorAll('[data-m="' + mines + '"]').forEach(e => e.classList.add('hl'));
+  }
+
+  function syncCurrency() {
+    curSym.textContent = CURRENCIES[cur];
+    document.querySelectorAll('.bet-quick button').forEach(b => { b.textContent = CURRENCIES[cur] + b.dataset.bet; });
+  }
+
+  function update(reshuffle) {
+    const mines = parseInt(minesEl.value, 10);
+    minesVal.textContent = mines;
+    minesEl.style.setProperty('--fill', ((mines - 1) / 23 * 100) + '%');
+    sumGems.textContent = TILES - mines;
+    if (ptableMines) ptableMines.textContent = mines;
+    if (reshuffle || mines !== lastMines) { renderBoard(mines); lastMines = mines; }
+    renderResults();
+    renderNextTile();
+    highlightColumn(mines);
+  }
+
+  minesEl.addEventListener('input', () => { collected = 0; update(false); });
+  betEl.addEventListener('input', () => { renderResults(); renderNextTile(); });
   document.getElementById('mines-inc').addEventListener('click', () => {
-    minesEl.value = Math.min(24, parseInt(minesEl.value, 10) + 1); update(false);
+    minesEl.value = Math.min(24, parseInt(minesEl.value, 10) + 1); collected = 0; update(false);
   });
   document.getElementById('mines-dec').addEventListener('click', () => {
-    minesEl.value = Math.max(1, parseInt(minesEl.value, 10) - 1); update(false);
+    minesEl.value = Math.max(1, parseInt(minesEl.value, 10) - 1); collected = 0; update(false);
   });
+  document.getElementById('col-inc').addEventListener('click', () => { collected++; renderNextTile(); });
+  document.getElementById('col-dec').addEventListener('click', () => { collected--; renderNextTile(); });
   document.querySelectorAll('.bet-quick button').forEach(b => {
-    b.addEventListener('click', () => { betEl.value = b.dataset.bet; renderResults(); });
+    b.addEventListener('click', () => { betEl.value = b.dataset.bet; renderResults(); renderNextTile(); });
+  });
+  document.querySelectorAll('#cur-quick button').forEach(b => {
+    b.addEventListener('click', () => {
+      cur = b.dataset.cur;
+      document.querySelectorAll('#cur-quick button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      syncCurrency();
+      renderResults();
+      renderNextTile();
+    });
   });
 
+  syncCurrency();
+  buildPayoutTable();
   update(true);
 </script>
 </body>
