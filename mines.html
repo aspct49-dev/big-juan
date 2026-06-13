@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mines Calculator — BigJuan</title>
+  <link rel="icon" href="uploads/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="uploads/icon-32.png" />
+  <link rel="apple-touch-icon" href="uploads/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'LaTequila';
+      src: url('uploads/La Tequila.ttf') format('truetype');
+      font-weight: normal; font-style: normal;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      color: #FAFAF7;
+      font-family: 'DM Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      background: linear-gradient(175deg, #0a1f0e 0%, #0d2a14 20%, #112e18 40%, #162c13 60%, #1e2a0f 80%, #2a2008 100%);
+      min-height: 100vh;
+    }
+    ::selection { background: rgba(212,168,67,0.3); color: #FAFAF7; }
+    img { max-width: 100%; }
+
+    @keyframes twinkle  { 0%,100% { opacity:0.06 } 50% { opacity:0.18 } }
+    @keyframes glowPulse{ 0%,100% { opacity:0.6  } 50% { opacity:1   } }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
+
+    /* ── Fixed atmosphere ── */
+    #page-bg { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+    #page-bg .pg-sunset {
+      position:absolute; top:-10%; right:-5%; width:70%; height:65%;
+      background:radial-gradient(ellipse at 80% 20%, rgba(212,120,58,0.09) 0%, rgba(212,168,67,0.05) 30%, transparent 65%);
+    }
+    #page-bg .pg-green {
+      position:absolute; top:0; left:0; width:50%; height:100%;
+      background:radial-gradient(ellipse at 0% 40%, rgba(27,107,46,0.1) 0%, transparent 60%);
+    }
+    #page-bg .pg-vignette {
+      position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 30%, transparent 40%, rgba(5,12,7,0.6) 100%);
+    }
+    .pg-star { position:absolute; border-radius:50%; background:#F0C75E; animation:twinkle 3s ease-in-out infinite; }
+
+    /* ── Navbar ── */
+    nav#navbar {
+      position:fixed; top:0; left:0; right:0; z-index:100; height:68px;
+      background:rgba(8,18,10,0.92); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+      border-bottom:1px solid rgba(212,168,67,0.12);
+      display:flex; align-items:center; justify-content:space-between; padding:0 48px;
+    }
+    .nav-left { display:flex; align-items:center; gap:32px; }
+    .nav-logo  { height:48px; }
+    .nav-links { display:flex; gap:28px; }
+    .nav-links a {
+      color:#B8B8B0; text-decoration:none;
+      font-family:'Oswald',sans-serif; font-size:13px; font-weight:600;
+      letter-spacing:1.5px; text-transform:uppercase; transition:color 0.2s; padding:8px 0;
+    }
+    .nav-links a:hover, .nav-links a.active { color:#F0C75E; }
+    .nav-cta {
+      background:#D4A843; color:#141414;
+      font-family:'Oswald',sans-serif; font-size:13px; font-weight:700;
+      padding:10px 28px; border-radius:6px; text-decoration:none;
+      text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;
+    }
+    .nav-cta:hover { background:#F0C75E; transform:translateY(-1px); }
+
+    .page { position:relative; z-index:1; padding-top:68px; }
+
+    /* ── Hero ── */
+    .mines-hero {
+      padding:56px 48px 28px; text-align:center; position:relative;
+    }
+    .mines-hero-glow {
+      position:absolute; top:-10%; left:50%; transform:translateX(-50%);
+      width:700px; height:400px; pointer-events:none;
+      background:radial-gradient(ellipse at 50% 50%, rgba(212,168,67,0.1) 0%, transparent 65%);
+      animation:glowPulse 4s ease-in-out infinite;
+    }
+    .mines-title {
+      font-family:'LaTequila','Oswald',sans-serif; font-size:clamp(18px,2.4vw,34px);
+      font-weight:normal; line-height:1; letter-spacing:0;
+      position:relative; z-index:1; margin-bottom:12px;
+    }
+    .mines-title .gold  { color:#D4A843; text-shadow:2px 2px 0 rgba(0,0,0,0.5), 0 2px 28px rgba(212,168,67,0.4); }
+    .mines-title .white { color:#F0ECD8; text-shadow:2px 2px 0 rgba(0,0,0,0.5); }
+    .mines-sub {
+      font-family:'DM Sans',sans-serif; font-size:15px; color:#888880;
+      position:relative; z-index:1; line-height:1.5; max-width:560px; margin:0 auto;
+    }
+    .mines-sub strong { color:#F0C75E; font-weight:700; }
+
+    /* ── Calculator ── */
+    .calc-wrap { max-width:960px; margin:0 auto; padding:32px 24px 80px; position:relative; z-index:1; }
+    .calc-grid { display:grid; grid-template-columns:1fr 1.25fr; gap:28px; align-items:start; }
+
+    .calc-card {
+      background:linear-gradient(160deg,#0d2614 0%,#091808 100%);
+      border:1.5px solid rgba(212,168,67,0.2); border-radius:20px;
+      padding:28px; box-shadow:0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,168,67,0.08);
+    }
+    .calc-card + .calc-card { margin-top:0; }
+
+    .control-group { margin-bottom:24px; }
+    .control-group:last-child { margin-bottom:0; }
+    .control-label {
+      display:flex; align-items:center; justify-content:space-between;
+      font-family:'Oswald',sans-serif; font-size:11px; font-weight:600;
+      color:#5A7050; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px;
+    }
+    .control-label .val {
+      font-family:'Oswald',sans-serif; font-size:22px; font-weight:700; color:#F0C75E; letter-spacing:0;
+    }
+
+    /* Bet input */
+    .bet-field {
+      display:flex; align-items:center; gap:10px;
+      background:rgba(0,0,0,0.3); border:1px solid rgba(212,168,67,0.18);
+      border-radius:12px; padding:12px 16px; transition:border-color 0.2s;
+    }
+    .bet-field:focus-within { border-color:rgba(212,168,67,0.5); }
+    .bet-field .cur { font-family:'Oswald',sans-serif; font-size:20px; font-weight:700; color:#D4A843; }
+    .bet-field input {
+      flex:1; background:none; border:none; outline:none; color:#FAFAF7;
+      font-family:'Oswald',sans-serif; font-size:20px; font-weight:600; min-width:0;
+    }
+    .bet-quick { display:flex; gap:8px; margin-top:10px; }
+    .bet-quick button {
+      flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(212,168,67,0.15);
+      color:#9AB880; font-family:'Oswald',sans-serif; font-size:12px; font-weight:600;
+      letter-spacing:1px; padding:8px 0; border-radius:8px; cursor:pointer; transition:all 0.15s;
+    }
+    .bet-quick button:hover { border-color:rgba(212,168,67,0.45); color:#F0C75E; }
+
+    /* Mines slider */
+    input[type=range].mines-slider {
+      -webkit-appearance:none; appearance:none; width:100%; height:8px; border-radius:6px;
+      background:linear-gradient(90deg,#D4A843 0%,#D4A843 var(--fill,12%), rgba(255,255,255,0.08) var(--fill,12%));
+      outline:none; cursor:pointer; margin-top:4px;
+    }
+    input[type=range].mines-slider::-webkit-slider-thumb {
+      -webkit-appearance:none; appearance:none; width:22px; height:22px; border-radius:50%;
+      background:#F0C75E; border:3px solid #0d2614; box-shadow:0 2px 10px rgba(212,168,67,0.6); cursor:pointer;
+    }
+    input[type=range].mines-slider::-moz-range-thumb {
+      width:22px; height:22px; border-radius:50%; background:#F0C75E; border:3px solid #0d2614;
+      box-shadow:0 2px 10px rgba(212,168,67,0.6); cursor:pointer;
+    }
+    .mines-scale {
+      display:flex; justify-content:space-between; margin-top:8px;
+      font-family:'DM Sans',sans-serif; font-size:10px; color:#4A6040;
+    }
+    .mines-steppers { display:flex; gap:8px; margin-top:14px; }
+    .mines-steppers button {
+      width:42px; height:42px; border-radius:10px; cursor:pointer;
+      background:rgba(255,255,255,0.04); border:1px solid rgba(212,168,67,0.2);
+      color:#F0C75E; font-family:'Oswald',sans-serif; font-size:20px; font-weight:700; transition:all 0.15s;
+    }
+    .mines-steppers button:hover { border-color:rgba(212,168,67,0.5); background:rgba(212,168,67,0.1); }
+
+    /* Board */
+    .board {
+      display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:18px;
+    }
+    .tile {
+      aspect-ratio:1; border-radius:10px; display:flex; align-items:center; justify-content:center;
+      font-size:clamp(16px,4.5vw,24px); user-select:none;
+      background:linear-gradient(160deg,#123019 0%,#0b1c0e 100%);
+      border:1px solid rgba(212,168,67,0.12); box-shadow:inset 0 1px 0 rgba(255,255,255,0.03);
+      transition:transform 0.15s;
+    }
+    .tile.gem  { border-color:rgba(46,160,90,0.35); box-shadow:inset 0 0 14px rgba(46,160,90,0.12); }
+    .tile.mine { border-color:rgba(214,70,58,0.45); box-shadow:inset 0 0 14px rgba(214,70,58,0.18); }
+    .board-note { font-family:'DM Sans',sans-serif; font-size:11px; color:#4A6040; text-align:center; margin-top:12px; }
+
+    /* Summary stat row */
+    .calc-summary { display:flex; gap:12px; margin-bottom:18px; }
+    .sum-box {
+      flex:1; background:rgba(0,0,0,0.25); border:1px solid rgba(212,168,67,0.12);
+      border-radius:12px; padding:12px 14px; text-align:center;
+    }
+    .sum-box .lbl { font-family:'Oswald',sans-serif; font-size:9px; font-weight:600; color:#5A7050; letter-spacing:1.5px; text-transform:uppercase; }
+    .sum-box .num { font-family:'Oswald',sans-serif; font-size:18px; font-weight:700; color:#F0C75E; margin-top:3px; }
+
+    /* Results table */
+    .results-title {
+      font-family:'Oswald',sans-serif; font-size:12px; font-weight:600; color:#5A5A52;
+      letter-spacing:2px; text-transform:uppercase; margin-bottom:10px;
+    }
+    .res-head {
+      display:grid; grid-template-columns:1fr 1fr 1.1fr 1.1fr; gap:8px;
+      padding:0 14px 8px; border-bottom:1px solid rgba(212,168,67,0.12);
+      font-family:'Oswald',sans-serif; font-size:10px; font-weight:600; color:#4A4A42; letter-spacing:1.5px; text-transform:uppercase;
+    }
+    .res-head .r, .res-row .r { text-align:right; }
+    .res-scroll { max-height:420px; overflow-y:auto; }
+    .res-scroll::-webkit-scrollbar { width:8px; }
+    .res-scroll::-webkit-scrollbar-thumb { background:rgba(212,168,67,0.2); border-radius:4px; }
+    .res-row {
+      display:grid; grid-template-columns:1fr 1fr 1.1fr 1.1fr; gap:8px; align-items:center;
+      padding:11px 14px; border-radius:8px;
+      font-family:'Oswald',sans-serif; font-size:14px;
+    }
+    .res-row + .res-row { border-top:1px solid rgba(255,255,255,0.04); }
+    .res-row:hover { background:rgba(212,168,67,0.05); }
+    .res-row .dia { color:#B8B8B0; display:flex; align-items:center; gap:6px; }
+    .res-row .mult { color:#9AB880; font-weight:600; }
+    .res-row .pay  { color:#FAFAF7; text-align:right; }
+    .res-row .prof { color:#3FBF6A; font-weight:700; text-align:right; }
+
+    /* ── Footer ── */
+    footer {
+      position:relative; z-index:1;
+      background:rgba(6,14,8,0.95); border-top:1px solid rgba(212,168,67,0.1);
+    }
+    .footer-inner { max-width:1200px; margin:0 auto; }
+    .footer-main {
+      display:grid; grid-template-columns:1fr 1fr 1fr;
+      align-items:start; padding:40px 48px 28px; gap:32px;
+    }
+    .footer-brand { display:flex; flex-direction:column; gap:22px; align-items:flex-start; justify-self:start; margin-left:-8px; }
+    .footer-logo-sm { height:56px; width:auto; max-width:none; display:block; object-fit:contain; }
+    .footer-copy {
+      font-family:'Oswald',sans-serif; font-size:11px; font-weight:500;
+      color:#5A5A52; letter-spacing:1.5px; text-transform:uppercase;
+    }
+    .footer-nav { display:flex; flex-direction:column; gap:14px; align-items:flex-start; }
+    .footer-link {
+      font-family:'Oswald',sans-serif; font-size:13px; font-weight:600;
+      color:#6E6E68; text-decoration:none; letter-spacing:1.5px;
+      text-transform:uppercase; transition:color 0.15s;
+    }
+    .footer-link:hover { color:#F0C75E; }
+    .footer-socials { display:flex; gap:10px; justify-content:flex-end; align-items:flex-start; }
+    .social-icon {
+      display:flex; align-items:center; justify-content:center;
+      width:34px; height:34px; border-radius:8px; text-decoration:none;
+      border:1px solid transparent; transition:all 0.2s; font-size:15px;
+    }
+    .social-icon.kick      { background:rgba(83,252,24,0.07);  border-color:rgba(83,252,24,0.15);  color:#53FC18; }
+    .social-icon.discord   { background:rgba(88,101,242,0.07); border-color:rgba(88,101,242,0.15); color:#7289DA; }
+    .social-icon.youtube   { background:rgba(255,0,0,0.06);    border-color:rgba(255,0,0,0.12);    color:#FF4444; }
+    .social-icon.instagram { background:rgba(225,48,108,0.07); border-color:rgba(225,48,108,0.18); color:#E1306C; }
+    .social-icon.twitter   { background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:#888880; }
+    .social-icon:hover { transform:translateY(-2px); filter:brightness(1.2); }
+    .footer-disclaimer-row {
+      margin:0 48px 28px; background:rgba(255,255,255,0.025);
+      border:1px solid rgba(255,255,255,0.05); border-radius:8px;
+      padding:14px 18px; display:flex; gap:14px; align-items:center;
+    }
+    .footer-age-badge {
+      font-family:'Oswald',sans-serif; font-size:12px; font-weight:700;
+      color:#888880; background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      padding:4px 10px; border-radius:6px; flex-shrink:0; letter-spacing:0.5px;
+    }
+    .footer-disclaimer-text {
+      font-family:'Oswald',sans-serif; font-size:10px; font-weight:500;
+      color:#5A5A52; letter-spacing:1px; line-height:1.6; text-transform:uppercase;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 860px) {
+      nav#navbar { padding:0 20px; }
+      .nav-left { gap:18px; }
+      .nav-links { gap:18px; }
+      .mines-hero { padding:44px 20px 24px; }
+      .calc-wrap { padding:28px 20px 64px; }
+      .calc-grid { grid-template-columns:1fr; gap:20px; }
+      .footer-main { grid-template-columns:1fr; gap:28px; padding:36px 24px 24px; }
+      .footer-brand { align-items:center; margin-left:0; }
+      .footer-nav { align-items:center; }
+      .footer-socials { justify-content:center; }
+      .footer-disclaimer-row { margin:0 24px 24px; }
+    }
+    @media (max-width: 600px) {
+      .nav-links { display:none; }
+      .nav-logo { height:40px; }
+      .nav-cta { padding:9px 18px; font-size:12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="page-bg">
+  <div class="pg-sunset"></div>
+  <div class="pg-green"></div>
+  <div class="pg-star" style="width:3px;height:3px;top:8%;left:12%;animation-delay:0s;animation-duration:4s;opacity:0.1"></div>
+  <div class="pg-star" style="width:2px;height:2px;top:20%;left:75%;animation-delay:1.2s;animation-duration:3s;opacity:0.08"></div>
+  <div class="pg-star" style="width:3px;height:3px;top:40%;left:90%;animation-delay:2s;animation-duration:5s;opacity:0.07"></div>
+  <div class="pg-vignette"></div>
+</div>
+
+<nav id="navbar">
+  <div class="nav-left">
+    <a href="index.html"><img src="uploads/pasted-1777425494211-0.png" alt="BigJuan" class="nav-logo" /></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#bonuses">Bonuses</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="mines.html" class="active">Mines</a>
+    </div>
+  </div>
+  <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="nav-cta">Claim Bonus</a>
+</nav>
+
+<div class="page">
+
+  <!-- Hero -->
+  <div class="mines-hero">
+    <div class="mines-hero-glow"></div>
+    <h1 class="mines-title"><span class="white">💎 MINES </span><span class="gold">CALCULATOR 💣</span></h1>
+    <p class="mines-sub">Pick your mines and bet to see the exact <strong>Stake</strong> payout multiplier for every diamond you uncover.</p>
+  </div>
+
+  <!-- Calculator -->
+  <div class="calc-wrap">
+    <div class="calc-grid">
+
+      <!-- Controls -->
+      <div class="calc-card">
+        <div class="control-group">
+          <div class="control-label"><span>Bet Amount</span></div>
+          <div class="bet-field">
+            <span class="cur">$</span>
+            <input id="bet" type="number" min="0" step="any" value="100" inputmode="decimal" />
+          </div>
+          <div class="bet-quick">
+            <button data-bet="10">$10</button>
+            <button data-bet="50">$50</button>
+            <button data-bet="100">$100</button>
+            <button data-bet="500">$500</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><span>Mines</span><span class="val" id="mines-val">3</span></div>
+          <input id="mines" class="mines-slider" type="range" min="1" max="24" value="3" />
+          <div class="mines-scale"><span>1</span><span>6</span><span>12</span><span>18</span><span>24</span></div>
+          <div class="mines-steppers">
+            <button id="mines-dec">−</button>
+            <button id="mines-inc">+</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><span>Board Preview</span></div>
+          <div class="board" id="board"></div>
+          <p class="board-note">5×5 grid · positions are illustrative only</p>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="calc-card">
+        <div class="calc-summary">
+          <div class="sum-box"><div class="lbl">Gems</div><div class="num" id="sum-gems">22</div></div>
+          <div class="sum-box"><div class="lbl">Max Multiplier</div><div class="num" id="sum-max">—</div></div>
+          <div class="sum-box"><div class="lbl">Max Payout</div><div class="num" id="sum-payout">—</div></div>
+        </div>
+
+        <div class="results-title">Payout per diamond</div>
+        <div class="res-head">
+          <span class="dia">Diamonds</span>
+          <span>Multiplier</span>
+          <span class="r">Payout</span>
+          <span class="r">Profit</span>
+        </div>
+        <div class="res-scroll"><div id="results"></div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <img src="uploads/pasted-1777425494211-0.png" alt="BigJuan" class="footer-logo-sm" />
+        <span class="footer-copy">© Copyright 2026 BigJuan.com</span>
+      </div>
+      <nav class="footer-nav">
+        <a href="index.html" class="footer-link">Home</a>
+        <a href="index.html#bonuses" class="footer-link">Bonuses</a>
+        <a href="leaderboard.html" class="footer-link">Leaderboard</a>
+        <a href="mines.html" class="footer-link">Mines</a>
+        <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="footer-link">Claim Bonus</a>
+      </nav>
+      <div class="footer-socials">
+        <a href="https://kick.com/bigjuanwins" target="_blank" rel="noopener" class="social-icon kick" title="Kick">
+          <img src="uploads/kick-logo.png" alt="Kick" style="width:16px;height:16px;object-fit:contain;" />
+        </a>
+        <a href="https://discord.com/invite/bigjuan" target="_blank" rel="noopener" class="social-icon discord" title="Discord">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.024.017.043.033.054a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        </a>
+        <a href="https://www.youtube.com/@BigJuanswins" target="_blank" rel="noopener" class="social-icon youtube" title="YouTube">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/bigjuangana/" target="_blank" rel="noopener" class="social-icon instagram" title="Instagram">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a href="https://x.com/BigJuanWins" target="_blank" rel="noopener" class="social-icon twitter" title="X (Twitter)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-disclaimer-row">
+      <span class="footer-age-badge">18+</span>
+      <span class="footer-disclaimer-text">We do not take responsibility for any losses from gambling in casinos and betting sites which are linked or promoted on our website(s). As a player, you are responsible for your bets.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const TILES = 25;
+  const betEl   = document.getElementById('bet');
+  const minesEl = document.getElementById('mines');
+  const minesVal= document.getElementById('mines-val');
+  const boardEl = document.getElementById('board');
+  const resultsEl = document.getElementById('results');
+  const sumGems = document.getElementById('sum-gems');
+  const sumMax  = document.getElementById('sum-max');
+  const sumPay  = document.getElementById('sum-payout');
+
+  // n choose k
+  function comb(n, k) {
+    if (k < 0 || k > n) return 0;
+    k = Math.min(k, n - k);
+    let r = 1;
+    for (let i = 0; i < k; i++) r = r * (n - i) / (i + 1);
+    return r;
+  }
+  // Stake Mines fair multiplier with 1% house edge
+  function multiplier(mines, diamonds) {
+    const gems = TILES - mines;
+    if (diamonds < 1 || diamonds > gems) return null;
+    return 0.99 * comb(TILES, diamonds) / comb(gems, diamonds);
+  }
+  function fmtMult(m) {
+    if (m >= 1000) return Math.round(m).toLocaleString('en-US') + '×';
+    return m.toFixed(2) + '×';
+  }
+  function fmtMoney(v) {
+    const dec = v >= 100000 ? 0 : 2;
+    return '$' + v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  }
+
+  function renderBoard(mines) {
+    // Random illustrative placement of mines on the 5x5 grid
+    const idx = Array.from({ length: TILES }, (_, i) => i);
+    for (let i = idx.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [idx[i], idx[j]] = [idx[j], idx[i]];
+    }
+    const mineSet = new Set(idx.slice(0, mines));
+    boardEl.innerHTML = '';
+    for (let i = 0; i < TILES; i++) {
+      const t = document.createElement('div');
+      const isMine = mineSet.has(i);
+      t.className = 'tile ' + (isMine ? 'mine' : 'gem');
+      t.textContent = isMine ? '💣' : '💎';
+      boardEl.appendChild(t);
+    }
+  }
+
+  function renderResults() {
+    const mines = parseInt(minesEl.value, 10);
+    const bet = Math.max(0, parseFloat(betEl.value) || 0);
+    const gems = TILES - mines;
+
+    minesVal.textContent = mines;
+    minesEl.style.setProperty('--fill', ((mines - 1) / 23 * 100) + '%');
+    sumGems.textContent = gems;
+
+    let rows = '';
+    let lastMult = 1;
+    for (let d = 1; d <= gems; d++) {
+      const m = multiplier(mines, d);
+      lastMult = m;
+      const payout = bet * m;
+      const profit = payout - bet;
+      rows += '<div class="res-row">'
+        + '<span class="dia">💎 ' + d + '</span>'
+        + '<span class="mult">' + fmtMult(m) + '</span>'
+        + '<span class="pay">' + fmtMoney(payout) + '</span>'
+        + '<span class="prof">+' + fmtMoney(profit) + '</span>'
+        + '</div>';
+    }
+    resultsEl.innerHTML = rows;
+    sumMax.textContent = fmtMult(lastMult);
+    sumPay.textContent = fmtMoney(bet * lastMult);
+  }
+
+  let lastMines = -1;
+  function update(reshuffle) {
+    const mines = parseInt(minesEl.value, 10);
+    if (reshuffle || mines !== lastMines) { renderBoard(mines); lastMines = mines; }
+    renderResults();
+  }
+
+  minesEl.addEventListener('input', () => update(false));
+  betEl.addEventListener('input', () => renderResults());
+  document.getElementById('mines-inc').addEventListener('click', () => {
+    minesEl.value = Math.min(24, parseInt(minesEl.value, 10) + 1); update(false);
+  });
+  document.getElementById('mines-dec').addEventListener('click', () => {
+    minesEl.value = Math.max(1, parseInt(minesEl.value, 10) - 1); update(false);
+  });
+  document.querySelectorAll('.bet-quick button').forEach(b => {
+    b.addEventListener('click', () => { betEl.value = b.dataset.bet; renderResults(); });
+  });
+
+  update(true);
+</script>
+</body>
+</html>
