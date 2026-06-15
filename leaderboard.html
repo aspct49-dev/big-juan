@@ -687,9 +687,14 @@
     });
   }
 
+  let clockSkew = 0;                            // serverTime - deviceTime; corrects for wrong device clocks
+  function now() { return Date.now() + clockSkew; }
+
   async function fetchSheet(url) {
     try {
       const res = await fetch(url);
+      const dateHdr = res.headers.get('date');   // server clock, CORS-exposed by Google
+      if (dateHdr) { const t = Date.parse(dateHdr); if (!isNaN(t)) clockSkew = t - Date.now(); }
       const text = await res.text();
       return parseCSV(text).slice(1).map(r => ({
         username: (r[2] || '').trim(),
@@ -744,20 +749,18 @@
 
   (async function initLeaderboard() {
     const { players, endDates } = await fetchLeaderboardData();
-    if (players.length) {
-      renderLeaderboard(players);
-      setCountdownFromDates(endDates);
-    } else {
-      renderPlaceholders();
-    }
+    countdownTarget = nextMonthStart();   // recompute fallback using server-corrected clock
+    setCountdownFromDates(endDates);
+    if (players.length) renderLeaderboard(players);
+    else renderPlaceholders();
   })();
 
   // Countdown targets the leaderboard's End Date (UTC) from the sheet while it's
   // still in the future. If that date has already passed (or fails to load), it
   // falls back to the 1st of next month so the timer never sticks at zero.
   function nextMonthStart() {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0).getTime();
+    const d = new Date(now());
+    return new Date(d.getFullYear(), d.getMonth() + 1, 1, 0, 0, 0, 0).getTime();
   }
   let countdownTarget = nextMonthStart();
 
@@ -785,13 +788,13 @@
     let best = null;
     (dates || []).forEach(raw => {
       const ms = parseSheetDate(raw);
-      if (!isNaN(ms) && ms > Date.now() && (best === null || ms > best)) best = ms;
+      if (!isNaN(ms) && ms > now() && (best === null || ms > best)) best = ms;
     });
     if (best !== null) { countdownTarget = best; updateCountdown(); }
   }
 
   function updateCountdown() {
-    const diff = countdownTarget - Date.now();
+    const diff = countdownTarget - now();
     if (diff <= 0) {
       ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => document.getElementById(id).textContent = '00');
       return;
