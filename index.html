@@ -108,13 +108,14 @@
     }
     .nav-links a:hover { color: #F0C75E; }
     .nav-cta {
-      background: #D4A843; color: #141414;
+      background: linear-gradient(180deg, #F0C75E 0%, #D4A843 100%); color: #12210C;
       font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700;
-      padding: 10px 28px; border-radius: 6px;
+      padding: 11px 28px; border-radius: 8px;
       text-decoration: none; text-transform: uppercase; letter-spacing: 1px;
+      box-shadow: 0 4px 14px rgba(212,168,67,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
       transition: all 0.2s;
     }
-    .nav-cta:hover { background: #F0C75E; transform: translateY(-1px); }
+    .nav-cta:hover { transform: translateY(-1px); filter: brightness(1.05); box-shadow: 0 6px 18px rgba(212,168,67,0.42), inset 0 1px 0 rgba(255,255,255,0.45); }
 
     /* ── Hero ── */
     #home {
@@ -193,22 +194,22 @@
     .hero-headline span { color: #F0C75E; }
     .hero-buttons { display: flex; gap: 16px; margin-bottom: 48px; }
     .btn-primary {
-      background: rgba(255,255,255,0.05); color: #FAFAF7; font-weight: 700; font-size: 14px;
-      padding: 14px 40px; border-radius: 8px; text-decoration: none;
+      background: linear-gradient(180deg, #F0C75E 0%, #D4A843 100%); color: #12210C; font-weight: 700; font-size: 14px;
+      padding: 15px 42px; border-radius: 10px; text-decoration: none;
       font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1.5px;
-      border: 1.5px solid rgba(212,168,67,0.35);
+      border: none;
       transition: all 0.2s; display: inline-block;
-      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 22px rgba(212,168,67,0.32), inset 0 1px 0 rgba(255,255,255,0.4);
     }
-    .btn-primary:hover { border-color: #F0C75E; color: #F0C75E; background: rgba(212,168,67,0.12); transform: translateY(-2px); }
+    .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 12px 30px rgba(212,168,67,0.5), inset 0 1px 0 rgba(255,255,255,0.5); }
     .btn-outline {
-      background: rgba(255,255,255,0.05); color: #FAFAF7; font-weight: 700; font-size: 14px;
-      padding: 14px 40px; border-radius: 8px; text-decoration: none;
+      background: rgba(255,255,255,0.04); color: #F5EFDF; font-weight: 700; font-size: 14px;
+      padding: 15px 42px; border-radius: 10px; text-decoration: none;
       font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1.5px;
-      border: 1px solid rgba(212,168,67,0.25); transition: all 0.2s; display: inline-block;
+      border: 1.5px solid rgba(212,168,67,0.4); transition: all 0.2s; display: inline-block;
       backdrop-filter: blur(8px);
     }
-    .btn-outline:hover { border-color: #D4A843; color: #F0C75E; background: rgba(212,168,67,0.08); }
+    .btn-outline:hover { border-color: #F0C75E; color: #F0C75E; background: rgba(212,168,67,0.1); transform: translateY(-2px); }
 
     .hero-stats { display: flex; gap: 56px; }
     .hero-stat-val { font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700; color: #FAFAF7; }
@@ -335,14 +336,15 @@
     }
     .bonus-cta-btn {
       display:block; text-align:center; width:100%;
-      background:#D4A843; color:#0a0800;
+      background:linear-gradient(180deg,#F0C75E 0%,#D4A843 100%); color:#12210C;
       font-family:'Oswald',sans-serif; font-size:15px; font-weight:700;
       letter-spacing:1.5px; text-transform:uppercase;
       padding:15px 24px; border-radius:10px; text-decoration:none;
+      box-shadow:0 6px 18px rgba(212,168,67,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
       transition:all 0.2s;
       margin-top:auto;
     }
-    .bonus-cta-btn:hover { background:#F0C75E; transform:translateY(-2px); box-shadow:0 0 0 2px rgba(255,255,255,0.55); }
+    .bonus-cta-btn:hover { transform:translateY(-2px); filter:brightness(1.05); box-shadow:0 12px 26px rgba(212,168,67,0.45), inset 0 1px 0 rgba(255,255,255,0.45); }
     .bonus-note {
       font-family:'DM Sans',sans-serif; font-size:11px; color:#3A5030;
       text-align:center; line-height:1.5;
@@ -390,13 +392,14 @@
     .lb-logo-us { font-size: 13px; font-style: normal; color: #999990; }
     .lb-logo-sep { color: rgba(212,168,67,0.35); font-size: 26px; font-weight: 300; }
     .lb-cta {
-      display: inline-block; background: #D4A843; color: #141414;
+      display: inline-block; background: linear-gradient(180deg, #F0C75E 0%, #D4A843 100%); color: #12210C;
       font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
-      padding: 13px 40px; border-radius: 8px; text-decoration: none;
+      padding: 14px 40px; border-radius: 10px; text-decoration: none;
       text-transform: uppercase; letter-spacing: 1.5px;
+      box-shadow: 0 6px 18px rgba(212,168,67,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
       transition: all 0.2s;
     }
-    .lb-cta:hover { background: #F0C75E; transform: translateY(-2px); box-shadow: 0 0 0 2px rgba(255,255,255,0.55); }
+    .lb-cta:hover { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 10px 24px rgba(212,168,67,0.45), inset 0 1px 0 rgba(255,255,255,0.45); }
 
     /* Cards */
     .lb-cards { display: flex; align-items: flex-end; justify-content: center; gap: 14px; }
