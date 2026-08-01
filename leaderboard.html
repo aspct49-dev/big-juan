@@ -354,6 +354,18 @@
       color:#5A5A52; letter-spacing:1px; line-height:1.6; text-transform:uppercase;
     }
 
+    /* ── Interaction & accessibility polish ── */
+    :where(a, button, input, [tabindex]):focus-visible {
+      outline: 2px solid #F0C75E; outline-offset: 3px; border-radius: 6px;
+    }
+    .lb-btn:active, .lb-cta:active, .nav-cta:active { transform: translateY(1px) scale(0.99); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+      }
+    }
+
     /* ════════════ Responsive / mobile ════════════ */
     @media (max-width: 860px) {
       nav#navbar { padding:0 20px; }

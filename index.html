@@ -503,6 +503,19 @@
       color: #5A5A52; letter-spacing: 1px; line-height: 1.6; text-transform: uppercase;
     }
 
+    /* ── Interaction & accessibility polish ── */
+    :where(a, button, input, [tabindex]):focus-visible {
+      outline: 2px solid #F0C75E; outline-offset: 3px; border-radius: 6px;
+    }
+    .btn-primary:active, .btn-outline:active, .nav-cta:active,
+    .lb-cta:active, .bonus-cta-btn:active { transform: translateY(1px) scale(0.99); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+      }
+    }
+
     /* ════════════ Responsive / mobile ════════════ */
     @media (max-width: 860px) {
       nav#navbar { padding: 0 20px; }
@@ -735,7 +748,7 @@
       <div class="bonus-logo-wrap">
         <img src="uploads/stake-us.webp" alt="Stake.US" style="height:145px;filter:brightness(0) invert(1);" />
       </div>
-      <div class="bonus-platform-desc">America's premier social casino experience.</div>
+      <div class="bonus-platform-desc">Free-to-play social casino for US players.</div>
       <div class="bonus-box">
         <div class="bonus-box-label">Exclusive Bonus</div>
         <div class="bonus-amount-row">
@@ -743,10 +756,11 @@
           <span class="bonus-amount-suffix">Free</span>
         </div>
         <div class="bonus-features">
-          <div class="bonus-feature">1sc Daily</div>
-          <div class="bonus-feature">5% rakeback</div>
+          <div class="bonus-feature">1 SC Daily</div>
+          <div class="bonus-feature">5% Rakeback</div>
+          <div class="bonus-feature">10% Loss Back</div>
           <div class="bonus-feature">Leaderboard Access</div>
-          <div class="bonus-feature">No deposit required</div>
+          <div class="bonus-feature">No Deposit Required</div>
         </div>
       </div>
       <a href="https://stake.us/?c=Risky" target="_blank" rel="noopener" class="bonus-cta-btn">Claim 25SC Free Now ↗</a>
@@ -761,7 +775,7 @@
       <div class="bonus-logo-wrap">
         <img src="uploads/stake-logo-white.png" alt="Stake" style="height:54px;" />
       </div>
-      <div class="bonus-platform-desc">The world's leading crypto casino.</div>
+      <div class="bonus-platform-desc">Crypto casino with instant deposits.</div>
       <div class="bonus-box">
         <div class="bonus-box-label">Exclusive Bonus</div>
         <div class="bonus-amount-row">
@@ -769,10 +783,11 @@
           <span class="bonus-amount-suffix">Bonus</span>
         </div>
         <div class="bonus-features">
-          <div class="bonus-feature">5% rakeback</div>
+          <div class="bonus-feature">5% Rakeback</div>
+          <div class="bonus-feature">10% Loss Back</div>
           <div class="bonus-feature">Leaderboard Access</div>
-          <div class="bonus-feature">Requires $50+ deposit</div>
-          <div class="bonus-feature">Requires $1,000+ wagered within 3 days of sign up</div>
+          <div class="bonus-feature">$50+ Deposit Required</div>
+          <div class="bonus-feature">$1,000+ Wagered in 3 Days</div>
         </div>
       </div>
       <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="bonus-cta-btn">Claim $50 Bonus ↗</a>
