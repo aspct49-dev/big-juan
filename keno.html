@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keno Assistant — BigJuan</title>
+  <link rel="icon" href="uploads/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="uploads/icon-32.png" />
+  <link rel="apple-touch-icon" href="uploads/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'LaTequila';
+      src: url('uploads/La Tequila.ttf') format('truetype');
+      font-weight: normal; font-style: normal;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      color: #FAFAF7;
+      font-family: 'DM Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      background: linear-gradient(175deg, #0a1f0e 0%, #0d2a14 20%, #112e18 40%, #162c13 60%, #1e2a0f 80%, #2a2008 100%);
+      min-height: 100vh;
+    }
+    ::selection { background: rgba(212,168,67,0.3); color: #FAFAF7; }
+    img { max-width: 100%; }
+
+    @keyframes twinkle  { 0%,100% { opacity:0.06 } 50% { opacity:0.18 } }
+    @keyframes glowPulse{ 0%,100% { opacity:0.6  } 50% { opacity:1   } }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
+
+    /* ── Fixed atmosphere ── */
+    #page-bg { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+    #page-bg .pg-sunset {
+      position:absolute; top:-10%; right:-5%; width:70%; height:65%;
+      background:radial-gradient(ellipse at 80% 20%, rgba(212,120,58,0.09) 0%, rgba(212,168,67,0.05) 30%, transparent 65%);
+    }
+    #page-bg .pg-green {
+      position:absolute; top:0; left:0; width:50%; height:100%;
+      background:radial-gradient(ellipse at 0% 40%, rgba(27,107,46,0.1) 0%, transparent 60%);
+    }
+    #page-bg .pg-vignette {
+      position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 30%, transparent 40%, rgba(5,12,7,0.6) 100%);
+    }
+    .pg-star { position:absolute; border-radius:50%; background:#F0C75E; animation:twinkle 3s ease-in-out infinite; }
+
+    /* ── Navbar ── */
+    nav#navbar {
+      position:fixed; top:0; left:0; right:0; z-index:100; height:68px;
+      background:rgba(8,18,10,0.92); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+      border-bottom:1px solid rgba(212,168,67,0.12);
+      display:flex; align-items:center; justify-content:space-between; padding:0 48px;
+    }
+    .nav-left { display:flex; align-items:center; gap:32px; }
+    .nav-logo  { height:48px; }
+    .nav-links { display:flex; gap:28px; }
+    .nav-links a {
+      color:#B8B8B0; text-decoration:none;
+      font-family:'Oswald',sans-serif; font-size:13px; font-weight:600;
+      letter-spacing:1.5px; text-transform:uppercase; transition:color 0.2s; padding:8px 0;
+    }
+    .nav-links a:hover, .nav-links a.active { color:#F0C75E; }
+    .nav-cta {
+      background:linear-gradient(180deg,#F0C75E 0%,#D4A843 100%); color:#12210C;
+      font-family:'Oswald',sans-serif; font-size:13px; font-weight:700;
+      padding:11px 28px; border-radius:8px; text-decoration:none;
+      text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;
+      box-shadow:0 4px 14px rgba(212,168,67,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+    .nav-cta:hover { transform:translateY(-1px); filter:brightness(1.05); box-shadow:0 6px 18px rgba(212,168,67,0.42), inset 0 1px 0 rgba(255,255,255,0.45); }
+
+    .page { position:relative; z-index:1; padding-top:68px; }
+
+    /* ── Hero ── */
+    .keno-hero { padding:56px 48px 28px; text-align:center; position:relative; }
+    .keno-hero-glow {
+      position:absolute; top:-10%; left:50%; transform:translateX(-50%);
+      width:min(700px, 100%); height:400px; pointer-events:none;
+      background:radial-gradient(ellipse at 50% 50%, rgba(212,168,67,0.1) 0%, transparent 65%);
+      animation:glowPulse 4s ease-in-out infinite;
+    }
+    .keno-title {
+      font-family:'LaTequila','Oswald',sans-serif; font-size:clamp(18px,2.4vw,34px);
+      font-weight:normal; line-height:1; letter-spacing:0;
+      position:relative; z-index:1; margin-bottom:12px;
+    }
+    .keno-title .gold  { color:#D4A843; text-shadow:2px 2px 0 rgba(0,0,0,0.5), 0 2px 28px rgba(212,168,67,0.4); }
+    .keno-title .white { color:#F0ECD8; text-shadow:2px 2px 0 rgba(0,0,0,0.5); }
+    .keno-sub {
+      font-family:'DM Sans',sans-serif; font-size:15px; color:#888880;
+      position:relative; z-index:1; line-height:1.5; max-width:560px; margin:0 auto;
+    }
+    .keno-sub strong { color:#F0C75E; font-weight:700; }
+
+    /* ── Layout ── */
+    .keno-wrap { max-width:1000px; margin:0 auto; padding:32px 24px 80px; position:relative; z-index:1; }
+    .keno-top { display:grid; grid-template-columns:1fr 300px; gap:24px; align-items:start; }
+    .card {
+      background:linear-gradient(160deg,#0d2614 0%,#091808 100%);
+      border:1.5px solid rgba(212,168,67,0.2); border-radius:20px;
+      padding:24px; box-shadow:0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,168,67,0.08);
+    }
+    .card + .card, .keno-top + .card { margin-top:24px; }
+    .keno-top > .card { margin-top:0; }
+    .card-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .card-title {
+      font-family:'Oswald',sans-serif; font-size:18px; font-weight:700; color:#FAFAF7;
+      letter-spacing:0.5px; text-transform:uppercase;
+    }
+    .card-sub { font-family:'DM Sans',sans-serif; font-size:12px; color:#5A7050; margin-top:3px; }
+    .badge {
+      font-family:'Oswald',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.5px;
+      color:#F0C75E; background:rgba(212,168,67,0.12); border:1px solid rgba(212,168,67,0.35);
+      padding:4px 10px; border-radius:999px; white-space:nowrap; transition:all 0.2s;
+    }
+    .badge.full { background:#D4A843; color:#12210C; border-color:#D4A843; }
+    .badge.shake { animation:shake 0.35s ease; }
+    @keyframes shake { 0%,100% { transform:translateX(0) } 25% { transform:translateX(-4px) } 75% { transform:translateX(4px) } }
+
+    /* Board */
+    .board { display:grid; grid-template-columns:repeat(8, 1fr); gap:8px; }
+    .tile {
+      aspect-ratio:1; border-radius:10px; cursor:pointer; user-select:none;
+      font-family:'Oswald',sans-serif; font-size:clamp(13px,2.2vw,17px); font-weight:600; color:#B8B8B0;
+      background:linear-gradient(160deg,#123019 0%,#0b1c0e 100%);
+      border:1px solid rgba(212,168,67,0.14); box-shadow:inset 0 1px 0 rgba(255,255,255,0.03);
+      transition:transform 0.12s, border-color 0.15s, color 0.15s;
+    }
+    .tile:hover { border-color:rgba(212,168,67,0.45); color:#FAFAF7; }
+    .tile.on {
+      background:linear-gradient(180deg,#F0C75E 0%,#D4A843 100%); color:#12210C; border-color:#F0C75E;
+      box-shadow:0 3px 12px rgba(212,168,67,0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+      animation:tilePop 0.2s ease;
+    }
+    @keyframes tilePop { from { transform:scale(0.85) } to { transform:scale(1) } }
+
+    .quick { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:18px; }
+    .quick-lbl {
+      font-family:'Oswald',sans-serif; font-size:11px; font-weight:600;
+      color:#5A7050; letter-spacing:2px; text-transform:uppercase; margin-right:4px;
+    }
+    .quick button {
+      width:32px; height:32px; border-radius:8px; cursor:pointer;
+      background:rgba(255,255,255,0.04); border:1px solid rgba(212,168,67,0.18);
+      color:#9AB880; font-family:'Oswald',sans-serif; font-size:13px; font-weight:600; transition:all 0.15s;
+    }
+    .quick button:hover { border-color:rgba(212,168,67,0.5); color:#F0C75E; }
+    .quick button.on { background:#D4A843; border-color:#D4A843; color:#12210C; }
+
+    .actions { display:flex; gap:10px; margin-top:16px; }
+    .btn-gold, .btn-ghost {
+      display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+      font-family:'Oswald',sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+      padding:10px 20px; border-radius:9px; transition:all 0.15s;
+    }
+    .btn-gold {
+      background:linear-gradient(180deg,#F0C75E 0%,#D4A843 100%); color:#12210C; border:none;
+      box-shadow:0 4px 14px rgba(212,168,67,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+    .btn-gold:hover { transform:translateY(-1px); filter:brightness(1.05); }
+    .btn-ghost { background:rgba(255,255,255,0.04); border:1px solid rgba(212,168,67,0.2); color:#9AB880; }
+    .btn-ghost:hover:not(:disabled) { border-color:rgba(212,168,67,0.5); color:#F0C75E; }
+    .btn-ghost:disabled { opacity:0.4; cursor:default; }
+
+    /* Risk */
+    .risk-list { display:flex; flex-direction:column; gap:8px; }
+    .risk-btn {
+      text-align:left; cursor:pointer; padding:12px 14px; border-radius:10px;
+      background:rgba(255,255,255,0.03); border:1px solid rgba(212,168,67,0.16);
+      font-family:'Oswald',sans-serif; font-size:15px; font-weight:600; color:#B8B8B0;
+      letter-spacing:0.5px; transition:all 0.15s;
+    }
+    .risk-btn:hover { border-color:rgba(212,168,67,0.45); color:#FAFAF7; }
+    .risk-btn.on {
+      background:linear-gradient(180deg,#F0C75E 0%,#D4A843 100%); border-color:#F0C75E; color:#12210C;
+      box-shadow:0 3px 12px rgba(212,168,67,0.3);
+    }
+    .stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:18px; }
+    .stat {
+      background:rgba(0,0,0,0.25); border:1px solid rgba(212,168,67,0.12);
+      border-radius:12px; padding:10px 12px;
+    }
+    .stat .lbl { font-family:'Oswald',sans-serif; font-size:9px; font-weight:600; color:#5A7050; letter-spacing:1.5px; text-transform:uppercase; }
+    .stat .num { font-family:'Oswald',sans-serif; font-size:18px; font-weight:700; color:#F0C75E; margin-top:2px; }
+
+    /* Payout table */
+    .ptable-scroll { overflow-x:auto; }
+    .ptable { width:100%; border-collapse:collapse; font-family:'Oswald',sans-serif; font-size:14px; }
+    .ptable th {
+      text-align:left; padding:0 12px 10px; border-bottom:1px solid rgba(212,168,67,0.18);
+      font-size:10px; font-weight:600; color:#5A7050; letter-spacing:1.5px; text-transform:uppercase;
+    }
+    .ptable td { padding:10px 12px; color:#C8C8C0; border-bottom:1px solid rgba(255,255,255,0.04); white-space:nowrap; }
+    .ptable .r { text-align:right; }
+    .ptable tbody tr:hover td { background:rgba(212,168,67,0.05); }
+    .mult {
+      display:inline-block; min-width:54px; text-align:center; font-weight:700;
+      padding:3px 8px; border-radius:6px; border:1px solid transparent;
+    }
+    .mult.zero { color:#4A5A44; }
+    .mult.part { color:#E0A458; background:rgba(224,164,88,0.1); border-color:rgba(224,164,88,0.3); }
+    .mult.win  { color:#3FBF6A; background:rgba(63,191,106,0.1); border-color:rgba(63,191,106,0.35); }
+    .mult.big  { color:#12210C; background:linear-gradient(180deg,#F0C75E 0%,#D4A843 100%); border-color:#F0C75E; }
+    .ptable tfoot td { border-bottom:none; border-top:1px solid rgba(212,168,67,0.18); color:#F0C75E; font-weight:700; }
+    .empty { font-family:'DM Sans',sans-serif; font-size:14px; color:#5A7050; text-align:center; padding:28px 0; }
+    .legend { display:flex; gap:14px; flex-wrap:wrap; margin-top:14px; font-family:'DM Sans',sans-serif; font-size:12px; color:#5A7050; }
+    .legend span { display:inline-flex; align-items:center; gap:6px; }
+    .legend i { width:10px; height:10px; border-radius:3px; display:inline-block; }
+
+    /* How to */
+    .howto { list-style:none; counter-reset:step; display:grid; gap:10px; }
+    .howto li {
+      counter-increment:step; display:flex; gap:12px; align-items:baseline;
+      font-family:'DM Sans',sans-serif; font-size:14px; color:#B8B8B0; line-height:1.5;
+    }
+    .howto li::before {
+      content:counter(step); flex-shrink:0; font-family:'Oswald',sans-serif; font-weight:700; color:#D4A843;
+    }
+    .howto strong { color:#F0C75E; }
+    .note {
+      display:flex; gap:12px; align-items:center; margin-top:24px;
+      background:rgba(255,255,255,0.025); border:1px solid rgba(212,168,67,0.18);
+      border-radius:12px; padding:14px 18px;
+      font-family:'DM Sans',sans-serif; font-size:13px; color:#888880; line-height:1.5;
+    }
+    .note svg { flex-shrink:0; color:#D4A843; }
+
+
+    /* ── Footer ── */
+    footer {
+      position:relative; z-index:1;
+      background:rgba(6,14,8,0.95); border-top:1px solid rgba(212,168,67,0.1);
+    }
+    .footer-inner { max-width:1200px; margin:0 auto; }
+    .footer-main {
+      display:grid; grid-template-columns:1fr 1fr 1fr;
+      align-items:start; padding:40px 48px 28px; gap:32px;
+    }
+    .footer-brand { display:flex; flex-direction:column; gap:22px; align-items:flex-start; justify-self:start; margin-left:-8px; }
+    .footer-logo-sm { height:56px; width:auto; max-width:none; display:block; object-fit:contain; }
+    .footer-copy {
+      font-family:'Oswald',sans-serif; font-size:11px; font-weight:500;
+      color:#5A5A52; letter-spacing:1.5px; text-transform:uppercase;
+    }
+    .footer-nav { display:flex; flex-direction:column; gap:14px; align-items:flex-start; }
+    .footer-link {
+      font-family:'Oswald',sans-serif; font-size:13px; font-weight:600;
+      color:#6E6E68; text-decoration:none; letter-spacing:1.5px;
+      text-transform:uppercase; transition:color 0.15s;
+    }
+    .footer-link:hover { color:#F0C75E; }
+    .footer-socials { display:flex; gap:10px; justify-content:flex-end; align-items:flex-start; }
+    .social-icon {
+      display:flex; align-items:center; justify-content:center;
+      width:34px; height:34px; border-radius:8px; text-decoration:none;
+      border:1px solid transparent; transition:all 0.2s; font-size:15px;
+    }
+    .social-icon.kick      { background:rgba(83,252,24,0.07);  border-color:rgba(83,252,24,0.15);  color:#53FC18; }
+    .social-icon.discord   { background:rgba(88,101,242,0.07); border-color:rgba(88,101,242,0.15); color:#7289DA; }
+    .social-icon.youtube   { background:rgba(255,0,0,0.06);    border-color:rgba(255,0,0,0.12);    color:#FF4444; }
+    .social-icon.instagram { background:rgba(225,48,108,0.07); border-color:rgba(225,48,108,0.18); color:#E1306C; }
+    .social-icon.twitter   { background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:#888880; }
+    .social-icon:hover { transform:translateY(-2px); filter:brightness(1.2); }
+    .footer-disclaimer-row {
+      margin:0 48px 28px; background:rgba(255,255,255,0.025);
+      border:1px solid rgba(255,255,255,0.05); border-radius:8px;
+      padding:14px 18px; display:flex; gap:14px; align-items:center;
+    }
+    .footer-age-badge {
+      font-family:'Oswald',sans-serif; font-size:12px; font-weight:700;
+      color:#888880; background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      padding:4px 10px; border-radius:6px; flex-shrink:0; letter-spacing:0.5px;
+    }
+    .footer-disclaimer-text {
+      font-family:'Oswald',sans-serif; font-size:10px; font-weight:500;
+      color:#5A5A52; letter-spacing:1px; line-height:1.6; text-transform:uppercase;
+    }
+
+    /* ── Interaction & accessibility polish ── */
+    :where(a, button, input, [tabindex]):focus-visible {
+      outline: 2px solid #F0C75E; outline-offset: 3px; border-radius: 6px;
+    }
+    .nav-cta:active, .btn-gold:active, .btn-ghost:active:not(:disabled), .tile:active,
+    .quick button:active, .risk-btn:active { transform: translateY(1px) scale(0.98); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+      }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 860px) {
+      nav#navbar { padding:0 20px; }
+      .nav-left { gap:18px; }
+      .nav-links { gap:18px; }
+      .keno-hero { padding:44px 20px 24px; }
+      .keno-wrap { padding:28px 16px 64px; }
+      .keno-top { grid-template-columns:1fr; }
+      .footer-main { grid-template-columns:1fr; gap:28px; padding:36px 24px 24px; }
+      .footer-brand { align-items:center; margin-left:0; }
+      .footer-nav { align-items:center; }
+      .footer-socials { justify-content:center; }
+      .footer-disclaimer-row { margin:0 24px 24px; }
+    }
+    @media (max-width: 600px) {
+      .nav-links { display:none; }
+      .nav-logo { height:40px; }
+      .nav-cta { padding:9px 18px; font-size:12px; }
+      .card { padding:18px; }
+      .board { gap:5px; }
+      .tile { border-radius:8px; }
+      .quick button { width:30px; height:30px; }
+      .ptable th, .ptable td { padding-left:6px; padding-right:6px; }
+      .ptable .odds { display:none; }
+      .mult { min-width:0; }
+      .keno-title { font-size:clamp(16px,5.4vw,24px); line-height:2.3; margin:-6px 0 4px; }
+      .keno-title span { display:block; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="page-bg">
+  <div class="pg-sunset"></div>
+  <div class="pg-green"></div>
+  <div class="pg-star" style="width:3px;height:3px;top:8%;left:12%;animation-delay:0s;animation-duration:4s;opacity:0.1"></div>
+  <div class="pg-star" style="width:2px;height:2px;top:20%;left:75%;animation-delay:1.2s;animation-duration:3s;opacity:0.08"></div>
+  <div class="pg-star" style="width:3px;height:3px;top:40%;left:90%;animation-delay:2s;animation-duration:5s;opacity:0.07"></div>
+  <div class="pg-vignette"></div>
+</div>
+
+<nav id="navbar">
+  <div class="nav-left">
+    <a href="index.html"><img src="uploads/pasted-1777425494211-0.png" alt="BigJuan" class="nav-logo" /></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#bonuses">Bonuses</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="mines.html">Mines</a>
+      <a href="slots.html">Slots</a>
+      <a href="keno.html" class="active">Keno</a>
+    </div>
+  </div>
+  <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="nav-cta">Claim Bonus</a>
+</nav>
+
+<div class="page">
+
+  <!-- Hero -->
+  <div class="keno-hero">
+    <div class="keno-hero-glow"></div>
+    <h1 class="keno-title"><span class="white">🎱 KENO </span><span class="gold">ASSISTANT 🎱</span></h1>
+    <p class="keno-sub">Pick your numbers and risk level to see the exact <strong>Stake</strong> Keno payouts, odds and expected value for every hit.</p>
+  </div>
+
+  <div class="keno-wrap">
+    <div class="keno-top">
+      <!-- Board -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Your Numbers</div>
+          <span class="badge" id="badge" aria-live="polite">0 / 10 selected</span>
+        </div>
+        <div class="board" id="board" role="group" aria-label="Keno numbers 1 to 40"></div>
+        <div class="quick" id="quick">
+          <span class="quick-lbl">Quick pick</span>
+        </div>
+        <div class="actions">
+          <button class="btn-gold" id="randomize">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+            Randomize
+          </button>
+          <button class="btn-ghost" id="clear" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Risk -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Risk Level</div></div>
+        <div class="risk-list" id="risks" role="radiogroup" aria-label="Risk level"></div>
+        <div class="stats">
+          <div class="stat"><div class="lbl">Picks</div><div class="num" id="s-picks">0</div></div>
+          <div class="stat"><div class="lbl">Top payout</div><div class="num" id="s-max">—</div></div>
+          <div class="stat"><div class="lbl">Payout chance</div><div class="num" id="s-win">—</div></div>
+          <div class="stat"><div class="lbl">Return to player</div><div class="num" id="s-rtp">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payouts -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Payout Reference</div>
+          <div class="card-sub" id="table-sub">Pick at least one number</div>
+        </div>
+      </div>
+      <div id="table-wrap"></div>
+    </div>
+
+    <!-- How to -->
+    <div class="card">
+      <div class="card-head"><div class="card-title">How To Use</div></div>
+      <ol class="howto">
+        <li><span>Click numbers on the board, or use Randomize / Quick pick for an instant selection (up to 10).</span></li>
+        <li><span>Choose a risk level to see how the payout multipliers change.</span></li>
+        <li><span>Check the table for the exact odds, multiplier and expected value of every hit count.</span></li>
+        <li><span>Play your numbers on Stake Keno with code <strong>TACO</strong>.</span></li>
+      </ol>
+      <div style="margin-top:20px">
+        <a class="btn-gold" href="https://stake.com/casino/games/keno?c=Risky&offer=taco" target="_blank" rel="noopener" style="text-decoration:none">
+          Play Keno on Stake
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="note">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span>This is a number helper for fun. It doesn't predict or influence results: every Stake Keno round is provably fair and fully random, and every set of the same size has exactly the same odds.</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <img src="uploads/pasted-1777425494211-0.png" alt="BigJuan" class="footer-logo-sm" />
+        <span class="footer-copy">© Copyright 2026 BigJuan.com</span>
+      </div>
+      <nav class="footer-nav">
+        <a href="index.html" class="footer-link">Home</a>
+        <a href="index.html#bonuses" class="footer-link">Bonuses</a>
+        <a href="leaderboard.html" class="footer-link">Leaderboard</a>
+        <a href="mines.html" class="footer-link">Mines</a>
+        <a href="slots.html" class="footer-link">Slots</a>
+        <a href="keno.html" class="footer-link">Keno</a>
+        <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="footer-link">Claim Bonus</a>
+      </nav>
+      <div class="footer-socials">
+        <a href="https://kick.com/bigjuanwins" target="_blank" rel="noopener" class="social-icon kick" title="Kick">
+          <img src="uploads/kick-logo.png" alt="Kick" style="width:16px;height:16px;object-fit:contain;" />
+        </a>
+        <a href="https://discord.com/invite/bigjuan" target="_blank" rel="noopener" class="social-icon discord" title="Discord">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.024.017.043.033.054a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        </a>
+        <a href="https://www.youtube.com/@BigJuanswins" target="_blank" rel="noopener" class="social-icon youtube" title="YouTube">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/bigjuangana/" target="_blank" rel="noopener" class="social-icon instagram" title="Instagram">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a href="https://x.com/BigJuanWins" target="_blank" rel="noopener" class="social-icon twitter" title="X (Twitter)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-disclaimer-row">
+      <span class="footer-age-badge">18+</span>
+      <span class="footer-disclaimer-text">We do not take responsibility for any losses from gambling in casinos and betting sites which are linked or promoted on our website(s). As a player, you are responsible for your bets.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Stake Keno: 40 numbers, 10 drawn, pick 1–10.
+  // PAYOUTS[risk][picks - 1][hits] = multiplier. Source: the Keno payout sheet
+  // (docs.google.com/spreadsheets/d/1BC5tewvQ_ICMC6McpE98GA5ldr2tSQ0U95ytmpzUEsc).
+  // Every table returns 98–99% against the exact odds below.
+  const PAYOUTS = {
+    classic: [[0,3.96],[0,1.9,4.5],[0,1,3.1,10.4],[0,0.8,1.8,5,22.5],[0,0.25,1.4,4.1,16.5,36],[0,0,1,3.68,7,16.5,40],[0,0,0.47,3,4.5,14,31,60],[0,0,0,2.2,4,13,22,55,70],[0,0,0,1.55,3,8,15,44,60,85],[0,0,0,1.4,2.25,4.5,8,17,50,80,100]],
+    low:     [[0.7,1.85],[0,2,3.8],[0,1.1,1.38,26],[0,0,2.2,7.9,90],[0,0,1.5,3,23,300],[0,0,1.1,2,5,105,1000],[0,0,1.1,1.6,3,15,250,3000],[0,0,1.1,1.5,2,4.5,32,500,5000],[0,0,1.1,1.3,1.7,2.5,7.5,40,500,5000],[0,0,1.1,1.2,1.3,1.8,3.5,12.5,50,500,5000]],
+    medium:  [[0.4,2.75],[0,1.8,5.1],[0,0,2.8,50],[0,0,1.7,10,100],[0,0,1.3,4,20,310],[0,0,0,2.5,8,189,2000],[0,0,0,2,6,27,500,5000],[0,0,0,2,4,9,55,1000,10000],[0,0,0,2,2.5,5,15,80,1000,10000],[0,0,0,1.6,2,4,7,25,100,1000,10000]],
+    high:    [[0,3.95],[0,0,17],[0,0,0,81.5],[0,0,0,10,259],[0,0,0,4,30,1000],[0,0,0,0,10,270,4000],[0,0,0,0,7,60,500,23000],[0,0,0,0,5,20,100,4300,45000],[0,0,0,0,4,10,45,700,4500,50000],[0,0,0,0,3.5,8,13,45,700,10000,100000]],
+  };
+  const RISKS = [['classic', 'Classic'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High']];
+  const TILES = 40, DRAWN = 10, MAX_PICKS = 10;
+  const BIG = 100;  // multipliers at or above this get the gold treatment
+
+  const $ = (id) => document.getElementById(id);
+  const selected = new Set();
+  let risk = 'classic';
+
+  // Hypergeometric odds of `hits` matches with `picks` numbers chosen.
+  function choose(n, k) {
+    if (k < 0 || k > n) return 0;
+    let r = 1;
+    for (let i = 1; i <= k; i++) r = r * (n - k + i) / i;
+    return r;
+  }
+  const prob = (picks, hits) =>
+    choose(DRAWN, hits) * choose(TILES - DRAWN, picks - hits) / choose(TILES, picks);
+
+  function randInt(max) {
+    const limit = Math.floor(0x100000000 / max) * max;
+    const u = new Uint32Array(1);
+    do { crypto.getRandomValues(u); } while (u[0] >= limit);
+    return u[0] % max;
+  }
+
+  const fmtMult = (m) => `${m.toLocaleString('en-US', { maximumFractionDigits: 2 })}×`;
+  function fmtPct(p) {
+    const v = p * 100;
+    if (v === 0) return '0%';
+    if (v >= 0.01) return `${v.toFixed(2)}%`;
+    // Three significant digits without falling into exponent notation.
+    return `${v.toFixed(Math.min(20, 2 - Math.floor(Math.log10(v))))}%`;
+  }
+  const oneIn = (p) => `1 in ${(1 / p).toLocaleString('en-US', { maximumFractionDigits: 1 / p < 10 ? 1 : 0 })}`;
+
+  // ── Build static UI ──
+  const boardEl = $('board');
+  boardEl.innerHTML = Array.from({ length: TILES }, (_, i) =>
+    `<button class="tile" data-n="${i + 1}" aria-pressed="false">${i + 1}</button>`).join('');
+
+  const quickEl = $('quick');
+  quickEl.insertAdjacentHTML('beforeend', Array.from({ length: MAX_PICKS }, (_, i) =>
+    `<button data-q="${i + 1}" aria-label="Quick pick ${i + 1} numbers">${i + 1}</button>`).join(''));
+
+  $('risks').innerHTML = RISKS.map(([key, label]) =>
+    `<button class="risk-btn" data-risk="${key}" role="radio" aria-checked="false">${label}</button>`).join('');
+
+  // ── Actions ──
+  function pickRandom(count) {
+    selected.clear();
+    while (selected.size < count) selected.add(randInt(TILES) + 1);
+    render();
+  }
+
+  boardEl.addEventListener('click', (e) => {
+    const t = e.target.closest('.tile');
+    if (!t) return;
+    const n = +t.dataset.n;
+    if (selected.has(n)) selected.delete(n);
+    else if (selected.size < MAX_PICKS) selected.add(n);
+    else {
+      const b = $('badge');
+      b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+      return;
+    }
+    render();
+  });
+  quickEl.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-q]');
+    if (b) pickRandom(+b.dataset.q);
+  });
+  $('randomize').addEventListener('click', () => pickRandom(selected.size || MAX_PICKS));
+  $('clear').addEventListener('click', () => { selected.clear(); render(); });
+  $('risks').addEventListener('click', (e) => {
+    const b = e.target.closest('.risk-btn');
+    if (!b) return;
+    risk = b.dataset.risk;
+    render();
+  });
+
+  // ── Render ──
+  function render() {
+    const picks = selected.size;
+
+    for (const t of boardEl.children) {
+      const on = selected.has(+t.dataset.n);
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-pressed', on);
+    }
+    for (const b of quickEl.querySelectorAll('button[data-q]')) b.classList.toggle('on', +b.dataset.q === picks);
+    for (const b of $('risks').children) {
+      const on = b.dataset.risk === risk;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-checked', on);
+    }
+    const badge = $('badge');
+    badge.textContent = `${picks} / ${MAX_PICKS} selected`;
+    badge.classList.toggle('full', picks === MAX_PICKS);
+    $('clear').disabled = picks === 0;
+    $('s-picks').textContent = picks;
+
+    const riskLabel = RISKS.find(([k]) => k === risk)[1];
+    if (!picks) {
+      $('table-sub').textContent = `${riskLabel} risk · pick at least one number`;
+      $('table-wrap').innerHTML = '<div class="empty">Select numbers on the board to see the payouts.</div>';
+      $('s-max').textContent = $('s-win').textContent = $('s-rtp').textContent = '—';
+      return;
+    }
+
+    const table = PAYOUTS[risk][picks - 1];
+    let rtp = 0, win = 0;
+    const rows = table.map((m, hits) => {
+      const p = prob(picks, hits);
+      const ev = m * p;
+      rtp += ev;
+      if (m > 0) win += p;
+      const cls = m === 0 ? 'zero' : m < 1 ? 'part' : m >= BIG ? 'big' : 'win';
+      return `<tr>` +
+        `<td>${hits} / ${picks}</td>` +
+        `<td><span class="mult ${cls}">${fmtMult(m)}</span></td>` +
+        `<td>${fmtPct(p)}</td>` +
+        `<td class="r odds">${oneIn(p)}</td>` +
+        `<td class="r">${ev.toFixed(4)}</td>` +
+      `</tr>`;
+    }).reverse();   // best outcome first
+
+    $('table-sub').textContent = `${picks} pick${picks === 1 ? '' : 's'} · ${riskLabel} risk`;
+    $('table-wrap').innerHTML =
+      `<div class="ptable-scroll"><table class="ptable">` +
+        `<thead><tr><th>Hits</th><th>Multiplier</th><th>Probability</th><th class="r odds">Odds</th><th class="r">EV</th></tr></thead>` +
+        `<tbody>${rows.join('')}</tbody>` +
+        `<tfoot><tr><td colspan="3">Total return per 1.00 bet</td><td class="odds"></td><td class="r">${rtp.toFixed(4)}</td></tr></tfoot>` +
+      `</table></div>` +
+      `<div class="legend">` +
+        `<span><i style="background:#3FBF6A"></i>Profit</span>` +
+        `<span><i style="background:#E0A458"></i>Part of your bet back</span>` +
+        `<span><i style="background:#D4A843"></i>${BIG}× or more</span>` +
+      `</div>`;
+
+    $('s-max').textContent = fmtMult(Math.max(...table));
+    $('s-win').textContent = fmtPct(win);
+    $('s-rtp').textContent = `${(rtp * 100).toFixed(2)}%`;
+  }
+
+  render();
+</script>
+</body>
+</html>
