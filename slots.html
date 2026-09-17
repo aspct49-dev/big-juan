@@ -78,7 +78,14 @@
     .page { position:relative; z-index:1; padding-top:68px; }
 
     /* ── Hero ── */
-    .slots-hero { padding:56px 48px 28px; text-align:center; position:relative; }
+    .slots-hero {
+      padding:56px 48px 44px; text-align:center; position:relative;
+      border-bottom:1px solid rgba(212,168,67,0.08);
+    }
+    .hero-mark {
+      height:44px; margin-bottom:26px; position:relative; z-index:1;
+      filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4));
+    }
     .slots-hero-glow {
       position:absolute; top:-10%; left:50%; transform:translateX(-50%);
       width:min(700px, 100%); height:400px; pointer-events:none;
@@ -112,12 +119,14 @@
 
     /* Provider filter */
     /* Scope toggle */
-    .scope { display:flex; gap:4px; padding:4px; margin-bottom:20px; background:rgba(0,0,0,0.3); border:1px solid rgba(212,168,67,0.15); border-radius:12px; }
+    .filters { margin-top:28px; padding-top:24px; border-top:1px solid rgba(212,168,67,0.1); }
+    .filters-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+    .scope { display:inline-flex; gap:2px; padding:3px; background:rgba(0,0,0,0.3); border:1px solid rgba(212,168,67,0.15); border-radius:10px; }
     .scope button {
-      flex:1; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;
-      background:none; border:none; border-radius:9px; padding:10px 12px;
-      font-family:'Oswald',sans-serif; font-size:14px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#9AB880;
-      transition:all 0.15s;
+      display:flex; align-items:center; justify-content:center; gap:7px; cursor:pointer;
+      background:none; border:none; border-radius:7px; padding:7px 14px;
+      font-family:'Oswald',sans-serif; font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#9AB880;
+      transition:all 0.15s; white-space:nowrap;
     }
     .scope button:hover:not(:disabled):not(.on) { color:#F0C75E; background:rgba(212,168,67,0.06); }
     .scope button.on {
@@ -125,7 +134,7 @@
       box-shadow:0 3px 10px rgba(212,168,67,0.3), inset 0 1px 0 rgba(255,255,255,0.35);
     }
     .scope button:disabled { cursor:default; }
-    .scope .n { font-size:12px; font-weight:500; opacity:0.75; letter-spacing:0; }
+    .scope .n { font-size:11px; font-weight:500; opacity:0.7; letter-spacing:0; }
     .excl-badge {
       display:inline-block; margin-left:8px; vertical-align:middle;
       font-family:'Oswald',sans-serif; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
@@ -171,8 +180,8 @@
 
     /* Reel */
     .reel-view {
-      position:relative; overflow:hidden; margin:24px -28px 0; height:250px;
-      background:rgba(0,0,0,0.28); border-top:1px solid rgba(212,168,67,0.1); border-bottom:1px solid rgba(212,168,67,0.1);
+      position:relative; overflow:hidden; margin:-28px -28px 0; height:250px; border-radius:18px 18px 0 0;
+      background:rgba(0,0,0,0.28); border-bottom:1px solid rgba(212,168,67,0.1);
     }
     .reel-track { display:flex; gap:12px; position:absolute; top:20px; left:0; will-change:transform; }
     .reel-card {
@@ -314,10 +323,10 @@
       .nav-left { gap:18px; }
       .nav-links { gap:14px; }
       .nav-links a { font-size:12px; letter-spacing:1px; }
-      .slots-hero { padding:44px 20px 24px; }
+      .slots-hero { padding:40px 20px 32px; }
       .slots-wrap { padding:28px 16px 64px; }
       .slots-card { padding:20px; }
-      .reel-view { margin:20px -20px 0; }
+      .reel-view { margin:-20px -20px 0; }
       .footer-main { grid-template-columns:1fr; gap:28px; padding:36px 24px 24px; }
       .footer-brand { align-items:center; margin-left:0; }
       .footer-nav { align-items:center; }
@@ -334,7 +343,8 @@
       .result { flex-direction:column; text-align:center; }
       .spin-row { justify-content:center; }
       .spin-btn { width:100%; }
-      .scope button { font-size:12px; letter-spacing:0.5px; padding:9px 6px; gap:6px; white-space:nowrap; }
+      .scope { display:flex; width:100%; }
+      .scope button { flex:1; padding:8px 6px; letter-spacing:0.5px; }
     }
   </style>
 </head>
@@ -370,27 +380,13 @@
   <!-- Hero -->
   <div class="slots-hero">
     <div class="slots-hero-glow"></div>
-    <h1 class="slots-title"><span class="white">🎰 SLOT </span><span class="gold">PICKER 🎰</span></h1>
-    <p class="slots-sub">Can't decide what to play? Spin for a random slot from the full <strong>Stake</strong> catalog, or narrow it down to your favourite providers.</p>
+    <img src="uploads/stake-logo-white.png" alt="Stake" class="hero-mark" />
+    <h1 class="slots-title"><span class="white">SLOT </span><span class="gold">PICKER</span></h1>
+    <p class="slots-sub">Can't pick a game? Spin for a random slot from Stake's full catalog.</p>
   </div>
 
   <div class="slots-wrap">
     <div class="slots-card">
-      <div class="scope" id="scope" role="radiogroup" aria-label="Which slots">
-        <button data-scope="all" class="on" role="radio" aria-checked="true">All slots <span class="n" id="n-all"></span></button>
-        <button data-scope="stake" role="radio" aria-checked="false">Only on Stake <span class="n" id="n-stake"></span></button>
-      </div>
-      <div class="prov-head">
-        <span class="sec-label">Providers</span>
-        <label class="prov-search">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input id="prov-q" type="search" placeholder="Search providers…" autocomplete="off" aria-label="Search providers" />
-        </label>
-        <button class="ghost-btn" id="prov-clear" disabled>Clear</button>
-      </div>
-      <div class="chips" id="chips" role="group" aria-label="Providers"></div>
-      <p class="chips-note" id="chips-note"></p>
-
       <div class="reel-view" id="reel">
         <div class="reel-marker"></div>
         <div class="reel-track" id="track"></div>
@@ -405,6 +401,25 @@
       </div>
 
       <div id="result" aria-live="polite"></div>
+
+      <div class="filters">
+        <div class="filters-head">
+          <span class="sec-label">Filter by provider</span>
+          <div class="scope" id="scope" role="radiogroup" aria-label="Which slots">
+            <button data-scope="all" class="on" role="radio" aria-checked="true">All slots <span class="n" id="n-all"></span></button>
+            <button data-scope="stake" role="radio" aria-checked="false">Only on Stake <span class="n" id="n-stake"></span></button>
+          </div>
+        </div>
+        <div class="prov-head">
+          <label class="prov-search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="prov-q" type="search" placeholder="Search providers…" autocomplete="off" aria-label="Search providers" />
+          </label>
+          <button class="ghost-btn" id="prov-clear" disabled>Clear</button>
+        </div>
+        <div class="chips" id="chips" role="group" aria-label="Providers"></div>
+        <p class="chips-note" id="chips-note"></p>
+      </div>
     </div>
     <p class="catalog-note" id="catalog-note"></p>
   </div>
@@ -459,7 +474,7 @@
   // A trailing 1 marks games Stake tags "Only on Stake".
   const REF = 'c=Risky&offer=taco';
   const IMGIX = 'https://mediumrare.imgix.net/';
-  const TOP_CHIPS = 30;         // chips shown when the search box is empty
+  const TOP_CHIPS = 20;         // chips shown when the search box is empty
   const MAX_MATCHES = 80;       // chips shown for a search
   const STRIDE = 162;           // card width + gap; must match the CSS
   const SPIN_MS = 5200;

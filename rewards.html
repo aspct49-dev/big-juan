@@ -80,7 +80,23 @@
     [hidden] { display:none !important; }
 
     /* ── Hero ── */
-    .rw-hero { padding:56px 48px 28px; text-align:center; position:relative; }
+    .rw-hero {
+      padding:56px 48px 44px; text-align:center; position:relative;
+      border-bottom:1px solid rgba(212,168,67,0.08);
+    }
+    .rw-eyebrow {
+      font-family:'DM Sans',sans-serif; font-size:13px; color:#B8B8B0;
+      letter-spacing:2.5px; text-transform:uppercase; margin-bottom:26px; position:relative; z-index:1;
+    }
+    .rw-eyebrow strong { color:#F0C75E; font-weight:700; }
+    .rw-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:26px; position:relative; z-index:1; }
+    .btn-outline {
+      display:inline-flex; align-items:center; justify-content:center; text-decoration:none;
+      background:rgba(255,255,255,0.04); color:#F5EFDF; border:1.5px solid rgba(212,168,67,0.4);
+      font-family:'Oswald',sans-serif; font-size:15px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+      padding:13px 30px; border-radius:10px; transition:all 0.15s;
+    }
+    .btn-outline:hover { border-color:#F0C75E; color:#F0C75E; background:rgba(212,168,67,0.1); transform:translateY(-1px); }
     .rw-hero-glow {
       position:absolute; top:-10%; left:50%; transform:translateX(-50%);
       width:min(700px, 100%); height:400px; pointer-events:none;
@@ -114,26 +130,30 @@
     .card-sub { font-family:'DM Sans',sans-serif; font-size:14px; color:#888880; margin:4px 0 22px; line-height:1.5; }
     .section { margin-top:28px; scroll-margin-top:90px; }
 
-    /* Reward tiles */
-    .tiles { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
-    .tile {
-      display:flex; flex-direction:column; gap:8px; text-decoration:none;
-      background:linear-gradient(160deg,#0f2a16 0%,#0a1c0c 100%);
-      border:1.5px solid rgba(212,168,67,0.16); border-radius:18px; padding:22px;
-      transition:transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+    /* Offers strip */
+    .offers {
+      display:grid; grid-template-columns:repeat(4, 1fr);
+      border:1.5px solid rgba(212,168,67,0.2); border-radius:20px; overflow:hidden;
+      background:linear-gradient(160deg,#0d2614 0%,#091808 100%);
     }
-    .tile:hover { transform:translateY(-3px); border-color:rgba(212,168,67,0.5); box-shadow:0 12px 30px rgba(0,0,0,0.45), 0 0 0 1px rgba(212,168,67,0.1); }
-    .tile-icon {
-      width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center;
-      font-size:22px; background:rgba(212,168,67,0.12); border:1px solid rgba(212,168,67,0.25); margin-bottom:4px;
+    .offer { padding:24px 22px; text-decoration:none; transition:background 0.15s; }
+    .offer + .offer { border-left:1px solid rgba(212,168,67,0.12); }
+    a.offer:hover { background:rgba(212,168,67,0.06); }
+    .offer-val { font-family:'Oswald',sans-serif; font-size:clamp(26px,3vw,34px); font-weight:700; color:#F0C75E; line-height:1.1; }
+    .offer-val small { font-size:0.55em; color:#D4A843; font-weight:600; margin-left:2px; }
+    .offer-lbl { font-family:'Oswald',sans-serif; font-size:13px; font-weight:600; color:#FAFAF7; letter-spacing:1px; text-transform:uppercase; margin-top:6px; }
+    .offer-note { font-family:'DM Sans',sans-serif; font-size:13px; color:#888880; line-height:1.45; margin-top:6px; }
+    .offers-foot { font-family:'DM Sans',sans-serif; font-size:13px; color:#5A7050; margin-top:12px; text-align:center; }
+    .offers-foot a { color:#D4A843; }
+
+    /* Programs */
+    .programs { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:28px; }
+    .program { display:flex; flex-direction:column; align-items:flex-start; }
+    .program .card-sub { flex:1; margin-bottom:20px; }
+    .eyebrow {
+      font-family:'Oswald',sans-serif; font-size:11px; font-weight:600; color:#D4A843;
+      letter-spacing:2px; text-transform:uppercase; margin-bottom:6px;
     }
-    .tile h3 { font-family:'Oswald',sans-serif; font-size:19px; font-weight:700; color:#FAFAF7; letter-spacing:0.3px; }
-    .tile p { font-family:'DM Sans',sans-serif; font-size:14px; color:#9A9A92; line-height:1.5; flex:1; }
-    .tile .more {
-      font-family:'Oswald',sans-serif; font-size:12px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
-      color:#D4A843; margin-top:6px; display:inline-flex; align-items:center; gap:6px;
-    }
-    .tile:hover .more { color:#F0C75E; }
 
     /* Forms */
     .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
@@ -150,6 +170,8 @@
       font-family:'DM Sans',sans-serif; font-size:15px; transition:border-color 0.2s;
     }
     .input::placeholder, .textarea::placeholder { color:#4A6040; }
+    .input[type=number] { -moz-appearance:textfield; appearance:textfield; }
+    .input::-webkit-outer-spin-button, .input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
     .input:focus, .textarea:focus { border-color:rgba(212,168,67,0.55); }
     .textarea { min-height:92px; resize:vertical; line-height:1.5; }
     .money { position:relative; }
@@ -160,13 +182,13 @@
     }
     .seg { display:flex; gap:6px; padding:4px; background:rgba(0,0,0,0.3); border:1px solid rgba(212,168,67,0.15); border-radius:11px; }
     .seg button {
-      flex:1; cursor:pointer; background:none; border:none; border-radius:8px; padding:9px 10px;
+      flex:1; cursor:pointer; background:rgba(255,255,255,0.03); border:1px solid rgba(212,168,67,0.14); border-radius:8px; padding:8px 10px;
       font-family:'Oswald',sans-serif; font-size:13px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#9AB880;
       transition:all 0.15s;
     }
-    .seg button:hover:not(.on) { color:#F0C75E; }
+    .seg button:hover:not(.on) { color:#F0C75E; border-color:rgba(212,168,67,0.4); }
     .seg button.on {
-      background:linear-gradient(180deg,#F0C75E 0%,#D4A843 100%); color:#12210C;
+      background:linear-gradient(180deg,#F0C75E 0%,#D4A843 100%); color:#12210C; border-color:#F0C75E;
       box-shadow:0 3px 10px rgba(212,168,67,0.3), inset 0 1px 0 rgba(255,255,255,0.35);
     }
     .field.invalid .input, .field.invalid .textarea, .field.invalid .seg { border-color:#D6463A; }
@@ -266,7 +288,7 @@
     :where(a, button, input, [tabindex]):focus-visible {
       outline: 2px solid #F0C75E; outline-offset: 3px; border-radius: 6px;
     }
-    .nav-cta:active, .btn-gold:active:not(:disabled), .seg button:active, .tile:active { transform: translateY(1px) scale(0.98); }
+    .nav-cta:active, .btn-gold:active:not(:disabled), .seg button:active, .btn-outline:active { transform: translateY(1px) scale(0.98); }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
@@ -280,9 +302,11 @@
       .nav-left { gap:18px; }
       .nav-links { gap:14px; }
       .nav-links a { font-size:12px; letter-spacing:1px; }
-      .rw-hero { padding:44px 20px 24px; }
+      .rw-hero { padding:40px 20px 32px; }
       .rw-wrap { padding:28px 16px 64px; }
-      .tiles { grid-template-columns:1fr 1fr; }
+      .offers { grid-template-columns:1fr 1fr; }
+      .offer:nth-child(3) { border-left:none; }
+      .offer:nth-child(n+3) { border-top:1px solid rgba(212,168,67,0.12); }
       .calc { grid-template-columns:1fr; gap:20px; }
       .footer-main { grid-template-columns:1fr; gap:28px; padding:36px 24px 24px; }
       .footer-brand { align-items:center; margin-left:0; }
@@ -298,7 +322,12 @@
       .nav-logo { height:40px; }
       .nav-cta { padding:9px 18px; font-size:12px; }
       .card { padding:20px; }
-      .tiles { grid-template-columns:1fr; gap:12px; }
+      .programs { grid-template-columns:1fr; gap:16px; margin-top:20px; }
+      .offer { padding:18px 16px; }
+      .rw-eyebrow { font-size:11px; letter-spacing:1.6px; }
+      .rw-title { font-size:clamp(16px,5.4vw,24px); line-height:2.3; margin:-6px 0 4px; }
+      .rw-title span { display:block; }
+      .rw-actions .btn-gold, .rw-actions .btn-outline { flex:1; }
       .grid-2 { grid-template-columns:1fr; }
       .btn-gold { width:100%; }
     }
@@ -336,55 +365,61 @@
   <!-- Hero -->
   <div class="rw-hero">
     <div class="rw-hero-glow"></div>
-    <h1 class="rw-title"><span class="white">🎁 </span><span class="gold">REWARDS</span><span class="white"> 🎁</span></h1>
-    <p class="rw-sub">Every way to earn extra on <strong>Stake</strong> with BigJuan.</p>
+    <p class="rw-eyebrow">Play on Stake with code <strong>TACO</strong></p>
+    <h1 class="rw-title"><span class="white">BIGJUAN </span><span class="gold">REWARDS</span></h1>
+    <p class="rw-sub">Everything you get for playing under our code, and how to get more.</p>
+    <div class="rw-actions">
+      <a class="btn-gold" href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener">Claim Bonus</a>
+      <a class="btn-outline" href="#vip">VIP Transfer</a>
+    </div>
   </div>
 
   <div class="rw-wrap">
-    <!-- Reward tiles -->
-    <div class="tiles">
-      <a class="tile" href="index.html#bonuses">
-        <div class="tile-icon">💰</div>
-        <h3>Sign-up Bonus</h3>
-        <p>$50 bonus on Stake.com, or 25 SC free on Stake.us with no deposit.</p>
-        <span class="more">View details →</span>
+    <!-- What you get -->
+    <div class="offers">
+      <a class="offer" href="index.html#bonuses">
+        <div class="offer-val">$50<small> / 25 SC</small></div>
+        <div class="offer-lbl">Sign-up bonus</div>
+        <div class="offer-note">Stake.com deposit bonus, or free SC on Stake.us</div>
       </a>
-      <a class="tile" href="index.html#bonuses">
-        <div class="tile-icon">🔁</div>
-        <h3>5% Rakeback</h3>
-        <p>Get a share of the house edge back on every bet you place.</p>
-        <span class="more">View details →</span>
+      <div class="offer">
+        <div class="offer-val">5%</div>
+        <div class="offer-lbl">Rakeback</div>
+        <div class="offer-note">A share of the house edge on every bet</div>
+      </div>
+      <div class="offer">
+        <div class="offer-val">10%</div>
+        <div class="offer-lbl">Loss back</div>
+        <div class="offer-note">Back on your net losses</div>
+      </div>
+      <a class="offer" href="leaderboard.html">
+        <div class="offer-val">$5,000</div>
+        <div class="offer-lbl">Leaderboard</div>
+        <div class="offer-note">Paid to the top wagerers every month</div>
       </a>
-      <a class="tile" href="index.html#bonuses">
-        <div class="tile-icon">🛡️</div>
-        <h3>10% Loss Back</h3>
-        <p>10% of your net losses back, so a bad run stings a little less.</p>
-        <span class="more">View details →</span>
-      </a>
-      <a class="tile" href="leaderboard.html">
-        <div class="tile-icon">🏆</div>
-        <h3>$5,000 Leaderboard</h3>
-        <p>Wager under code TACO and climb the monthly leaderboard for cash prizes.</p>
-        <span class="more">View leaderboard →</span>
-      </a>
-      <a class="tile" href="referral.html">
-        <div class="tile-icon">🤝</div>
-        <h3>Refer a Friend</h3>
-        <p>Earn passive income by bringing your friends in.</p>
-        <span class="more">View details →</span>
-      </a>
-      <a class="tile" href="#vip">
-        <div class="tile-icon">👑</div>
-        <h3>VIP Transfer</h3>
-        <p>Already a VIP somewhere else? Bring your stats and we'll make you an offer.</p>
-        <span class="more">Apply below →</span>
-      </a>
+    </div>
+    <p class="offers-foot">Bonus requirements are on the <a href="index.html#bonuses">home page</a>. Claim them with a Discord ticket.</p>
+
+    <div class="programs">
+      <section class="card program">
+        <div class="eyebrow">Refer a friend</div>
+        <div class="card-title">Earn from your friends' play</div>
+        <p class="card-sub">Get a share of their leaderboard prizes and a bonus as their monthly wager grows. They keep all of their own rewards.</p>
+        <a class="btn-outline" href="referral.html">See the program</a>
+      </section>
+      <section class="card program">
+        <div class="eyebrow">VIP transfer</div>
+        <div class="card-title">Coming from another site?</div>
+        <p class="card-sub">Tell us what you wager and what you get now, and we'll make you an offer on Discord.</p>
+        <a class="btn-outline" href="#vip">Apply below</a>
+      </section>
     </div>
 
     <!-- Calculator -->
     <section class="card section" id="calculator">
-      <div class="card-title">One-Month Rewards Estimate</div>
-      <p class="card-sub">Add it up: an estimate of your rakeback and loss back for a month.</p>
+      <div class="eyebrow">Calculator</div>
+      <div class="card-title">Estimate a month of rewards</div>
+      <p class="card-sub">Enter your wager and result to see roughly what rakeback and loss back pay.</p>
       <div class="calc">
         <div style="display:flex;flex-direction:column;gap:18px">
           <div class="field">
@@ -411,16 +446,16 @@
         </div>
       </div>
       <p class="fineprint">
-        Rakeback is estimated as 5% of Stake's house edge on your wager, assuming a typical 1% edge; the real edge
-        depends on the games you play. Loss back is 10% of your net loss for the month. The sign-up bonus,
-        leaderboard prizes and referral earnings aren't included, since they're one-time or depend on placing.
+        Rakeback assumes a 1% house edge; the real edge depends on what you play. Loss back is 10% of your
+        net loss for the month. Bonuses, leaderboard prizes and referrals aren't included.
       </p>
     </section>
 
     <!-- VIP transfer -->
     <section class="card section" id="vip">
-      <div class="card-title">VIP Transfer</div>
-      <p class="card-sub">Already a VIP somewhere else? Bring your stats to us and we'll get back to you on Discord.</p>
+      <div class="eyebrow">VIP transfer</div>
+      <div class="card-title">Tell us about your play</div>
+      <p class="card-sub">Fill this in and we'll get back to you on Discord.</p>
       <form id="vip-form" novalidate>
         <div class="hp" aria-hidden="true">
           <label for="v-website">Leave this empty</label>

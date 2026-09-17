@@ -78,7 +78,14 @@
     .page { position:relative; z-index:1; padding-top:68px; }
 
     /* ── Hero ── */
-    .keno-hero { padding:56px 48px 28px; text-align:center; position:relative; }
+    .keno-hero {
+      padding:56px 48px 44px; text-align:center; position:relative;
+      border-bottom:1px solid rgba(212,168,67,0.08);
+    }
+    .hero-mark {
+      height:44px; margin-bottom:26px; position:relative; z-index:1;
+      filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4));
+    }
     .keno-hero-glow {
       position:absolute; top:-10%; left:50%; transform:translateX(-50%);
       width:min(700px, 100%); height:400px; pointer-events:none;
@@ -186,7 +193,7 @@
       background:rgba(0,0,0,0.25); border:1px solid rgba(212,168,67,0.12);
       border-radius:12px; padding:10px 12px;
     }
-    .stat .lbl { font-family:'Oswald',sans-serif; font-size:9px; font-weight:600; color:#5A7050; letter-spacing:1.5px; text-transform:uppercase; }
+    .stat .lbl { font-family:'Oswald',sans-serif; font-size:10.5px; font-weight:600; color:#7A9070; letter-spacing:1.2px; text-transform:uppercase; }
     .stat .num { font-family:'Oswald',sans-serif; font-size:18px; font-weight:700; color:#F0C75E; margin-top:2px; }
 
     /* Payout table */
@@ -213,23 +220,19 @@
     .legend span { display:inline-flex; align-items:center; gap:6px; }
     .legend i { width:10px; height:10px; border-radius:3px; display:inline-block; }
 
-    /* How to */
-    .howto { list-style:none; counter-reset:step; display:grid; gap:10px; }
-    .howto li {
-      counter-increment:step; display:flex; gap:12px; align-items:baseline;
-      font-family:'DM Sans',sans-serif; font-size:14px; color:#B8B8B0; line-height:1.5;
+    /* Play strip */
+    .play-strip {
+      display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-top:24px;
+      padding:20px 24px; border-radius:16px;
+      background:linear-gradient(135deg, rgba(212,168,67,0.14), rgba(212,168,67,0.03));
+      border:1px solid rgba(212,168,67,0.3);
     }
-    .howto li::before {
-      content:counter(step); flex-shrink:0; font-family:'Oswald',sans-serif; font-weight:700; color:#D4A843;
+    .play-strip p { font-family:'DM Sans',sans-serif; font-size:15px; color:#D8D8D0; line-height:1.5; }
+    .play-strip strong { color:#F0C75E; }
+    .fineprint {
+      font-family:'DM Sans',sans-serif; font-size:12px; color:#5A7050; line-height:1.6;
+      text-align:center; max-width:640px; margin:18px auto 0;
     }
-    .howto strong { color:#F0C75E; }
-    .note {
-      display:flex; gap:12px; align-items:center; margin-top:24px;
-      background:rgba(255,255,255,0.025); border:1px solid rgba(212,168,67,0.18);
-      border-radius:12px; padding:14px 18px;
-      font-family:'DM Sans',sans-serif; font-size:13px; color:#888880; line-height:1.5;
-    }
-    .note svg { flex-shrink:0; color:#D4A843; }
 
 
     /* ── Footer ── */
@@ -302,7 +305,7 @@
       .nav-left { gap:18px; }
       .nav-links { gap:14px; }
       .nav-links a { font-size:12px; letter-spacing:1px; }
-      .keno-hero { padding:44px 20px 24px; }
+      .keno-hero { padding:40px 20px 32px; }
       .keno-wrap { padding:28px 16px 64px; }
       .keno-top { grid-template-columns:1fr; }
       .footer-main { grid-template-columns:1fr; gap:28px; padding:36px 24px 24px; }
@@ -327,6 +330,8 @@
       .mult { min-width:0; }
       .keno-title { font-size:clamp(16px,5.4vw,24px); line-height:2.3; margin:-6px 0 4px; }
       .keno-title span { display:block; }
+      .play-strip { padding:18px; text-align:center; justify-content:center; }
+      .play-strip .btn-gold { width:100%; justify-content:center; }
     }
   </style>
 </head>
@@ -362,8 +367,9 @@
   <!-- Hero -->
   <div class="keno-hero">
     <div class="keno-hero-glow"></div>
-    <h1 class="keno-title"><span class="white">🎱 KENO </span><span class="gold">ASSISTANT 🎱</span></h1>
-    <p class="keno-sub">Pick your numbers and risk level to see the exact <strong>Stake</strong> Keno payouts, odds and expected value for every hit.</p>
+    <img src="uploads/stake-logo-white.png" alt="Stake" class="hero-mark" />
+    <h1 class="keno-title"><span class="white">KENO </span><span class="gold">ASSISTANT</span></h1>
+    <p class="keno-sub">Pick your numbers and a risk level to see Stake's exact Keno payouts and odds.</p>
   </div>
 
   <div class="keno-wrap">
@@ -398,7 +404,7 @@
           <div class="stat"><div class="lbl">Picks</div><div class="num" id="s-picks">0</div></div>
           <div class="stat"><div class="lbl">Top payout</div><div class="num" id="s-max">—</div></div>
           <div class="stat"><div class="lbl">Payout chance</div><div class="num" id="s-win">—</div></div>
-          <div class="stat"><div class="lbl">Return to player</div><div class="num" id="s-rtp">—</div></div>
+          <div class="stat"><div class="lbl" title="Return to player">RTP</div><div class="num" id="s-rtp">—</div></div>
         </div>
       </div>
     </div>
@@ -414,27 +420,14 @@
       <div id="table-wrap"></div>
     </div>
 
-    <!-- How to -->
-    <div class="card">
-      <div class="card-head"><div class="card-title">How To Use</div></div>
-      <ol class="howto">
-        <li><span>Click numbers on the board, or use Randomize / Quick pick for an instant selection (up to 10).</span></li>
-        <li><span>Choose a risk level to see how the payout multipliers change.</span></li>
-        <li><span>Check the table for the exact odds, multiplier and expected value of every hit count.</span></li>
-        <li><span>Play your numbers on Stake Keno with code <strong>TACO</strong>.</span></li>
-      </ol>
-      <div style="margin-top:20px">
-        <a class="btn-gold" href="https://stake.com/casino/games/keno?c=Risky&offer=taco" target="_blank" rel="noopener" style="text-decoration:none">
-          Play Keno on Stake
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-        </a>
-      </div>
+    <div class="play-strip">
+      <p>Play your numbers on Stake Keno with code <strong>TACO</strong>.</p>
+      <a class="btn-gold" href="https://stake.com/casino/games/keno?c=Risky&offer=taco" target="_blank" rel="noopener" style="text-decoration:none">
+        Play Keno on Stake
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </a>
     </div>
-
-    <div class="note">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-      <span>This is a number helper for fun. It doesn't predict or influence results: every Stake Keno round is provably fair and fully random, and every set of the same size has exactly the same odds.</span>
-    </div>
+    <p class="fineprint">This tool doesn't predict or influence results. Every Stake Keno round is provably fair, and any set of the same size has exactly the same odds.</p>
   </div>
 </div>
 
