@@ -111,6 +111,27 @@
     }
 
     /* Provider filter */
+    /* Scope toggle */
+    .scope { display:flex; gap:4px; padding:4px; margin-bottom:20px; background:rgba(0,0,0,0.3); border:1px solid rgba(212,168,67,0.15); border-radius:12px; }
+    .scope button {
+      flex:1; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;
+      background:none; border:none; border-radius:9px; padding:10px 12px;
+      font-family:'Oswald',sans-serif; font-size:14px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#9AB880;
+      transition:all 0.15s;
+    }
+    .scope button:hover:not(:disabled):not(.on) { color:#F0C75E; background:rgba(212,168,67,0.06); }
+    .scope button.on {
+      background:linear-gradient(180deg,#F0C75E 0%,#D4A843 100%); color:#12210C;
+      box-shadow:0 3px 10px rgba(212,168,67,0.3), inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+    .scope button:disabled { cursor:default; }
+    .scope .n { font-size:12px; font-weight:500; opacity:0.75; letter-spacing:0; }
+    .excl-badge {
+      display:inline-block; margin-left:8px; vertical-align:middle;
+      font-family:'Oswald',sans-serif; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+      color:#12210C; background:#D4A843; padding:2px 7px; border-radius:5px;
+    }
+
     .prov-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
     .prov-search {
       flex:1; min-width:180px; display:flex; align-items:center; gap:8px;
@@ -291,7 +312,8 @@
     @media (max-width: 860px) {
       nav#navbar { padding:0 20px; }
       .nav-left { gap:18px; }
-      .nav-links { gap:18px; }
+      .nav-links { gap:14px; }
+      .nav-links a { font-size:12px; letter-spacing:1px; }
       .slots-hero { padding:44px 20px 24px; }
       .slots-wrap { padding:28px 16px 64px; }
       .slots-card { padding:20px; }
@@ -302,6 +324,9 @@
       .footer-socials { justify-content:center; }
       .footer-disclaimer-row { margin:0 24px 24px; }
     }
+    @media (max-width: 720px) {
+      .nav-links { display:none; }
+    }
     @media (max-width: 600px) {
       .nav-links { display:none; }
       .nav-logo { height:40px; }
@@ -309,6 +334,7 @@
       .result { flex-direction:column; text-align:center; }
       .spin-row { justify-content:center; }
       .spin-btn { width:100%; }
+      .scope button { font-size:12px; letter-spacing:0.5px; padding:9px 6px; gap:6px; white-space:nowrap; }
     }
   </style>
 </head>
@@ -333,6 +359,7 @@
       <a href="mines.html">Mines</a>
       <a href="slots.html" class="active">Slots</a>
       <a href="keno.html">Keno</a>
+      <a href="rewards.html">Rewards</a>
     </div>
   </div>
   <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="nav-cta">Claim Bonus</a>
@@ -349,6 +376,10 @@
 
   <div class="slots-wrap">
     <div class="slots-card">
+      <div class="scope" id="scope" role="radiogroup" aria-label="Which slots">
+        <button data-scope="all" class="on" role="radio" aria-checked="true">All slots <span class="n" id="n-all"></span></button>
+        <button data-scope="stake" role="radio" aria-checked="false">Only on Stake <span class="n" id="n-stake"></span></button>
+      </div>
       <div class="prov-head">
         <span class="sec-label">Providers</span>
         <label class="prov-search">
@@ -393,6 +424,7 @@
         <a href="mines.html" class="footer-link">Mines</a>
         <a href="slots.html" class="footer-link">Slots</a>
         <a href="keno.html" class="footer-link">Keno</a>
+        <a href="rewards.html" class="footer-link">Rewards</a>
         <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="footer-link">Claim Bonus</a>
       </nav>
       <div class="footer-socials">
@@ -422,8 +454,9 @@
 
 <script>
   // Catalog lives in slots.json (regenerate with scripts/update-slots.mjs):
-  //   { updated, providers: [name, ...], games: [[name, slug, img, providerIndex], ...] }
+  //   { updated, providers: [name, ...], games: [[name, slug, img, providerIndex, onlyOnStake?], ...] }
   // `img` is a mediumrare.imgix.net asset id, or a full URL for the few hosted elsewhere.
+  // A trailing 1 marks games Stake tags "Only on Stake".
   const REF = 'c=Risky&offer=taco';
   const IMGIX = 'https://mediumrare.imgix.net/';
   const TOP_CHIPS = 30;         // chips shown when the search box is empty
@@ -439,6 +472,8 @@
   const spinBtn = $('spin'), poolEl = $('pool-count'), resultEl = $('result');
 
   let providers = [], keys = [], counts = [], games = [];
+  let onlyStake = false;        // the scope toggle
+  let scoped = [];              // games in the current scope, before provider filtering
   const selected = new Set();   // provider indices; empty = every provider
   let pool = [];
   let spinning = false;
@@ -468,13 +503,19 @@
   // ── Provider chips ──
   function renderChips() {
     const q = norm(qEl.value);
-    let list;
+    // Providers with games in the current scope, biggest first. Selected ones
+    // always stay visible, even if the scope leaves them empty.
+    const ranked = providers.map((_, i) => i)
+      .filter((i) => counts[i] > 0 || selected.has(i))
+      .sort((a, b) => counts[b] - counts[a] || a - b);
+    let list, matches = 0;
     if (q) {
-      list = providers.map((_, i) => i).filter((i) => keys[i].includes(q)).slice(0, MAX_MATCHES);
+      const hits = ranked.filter((i) => keys[i].includes(q));
+      matches = hits.length;
+      list = hits.slice(0, MAX_MATCHES);
     } else {
-      // Selected providers always stay visible, even ones outside the top list.
-      const top = providers.slice(0, TOP_CHIPS).map((_, i) => i);
-      list = [...new Set([...selected, ...top])].sort((a, b) => a - b);
+      const top = ranked.filter((i) => counts[i] > 0).slice(0, TOP_CHIPS);
+      list = ranked.filter((i) => top.includes(i) || selected.has(i));
     }
     chipsEl.innerHTML = list.map((i) =>
       `<button class="chip${selected.has(i) ? ' on' : ''}" data-i="${i}" aria-pressed="${selected.has(i)}"${spinning ? ' disabled' : ''}>` +
@@ -482,13 +523,16 @@
     ).join('') || '<span class="chips-note">No providers match.</span>';
 
     const note = $('chips-note');
+    const available = counts.filter((c) => c > 0).length;
     if (q) {
-      const total = keys.filter((k) => k.includes(q)).length;
-      note.textContent = total > MAX_MATCHES ? `Showing ${MAX_MATCHES} of ${total} matches. Keep typing to narrow it down.` : '';
+      note.textContent = matches > MAX_MATCHES ? `Showing ${MAX_MATCHES} of ${matches} matches. Keep typing to narrow it down.` : '';
     } else {
-      note.textContent = `Top ${TOP_CHIPS} of ${providers.length.toLocaleString()} providers. Search to find the rest.`;
+      note.textContent = available > TOP_CHIPS
+        ? `Top ${TOP_CHIPS} of ${available.toLocaleString()} providers. Search to find the rest.`
+        : '';
     }
     clearBtn.disabled = spinning || selected.size === 0;
+    for (const b of $('scope').children) b.disabled = spinning;
   }
 
   chipsEl.addEventListener('click', (e) => {
@@ -500,6 +544,25 @@
     renderChips();
   });
   qEl.addEventListener('input', renderChips);
+  $('scope').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-scope]');
+    if (!btn || spinning) return;
+    onlyStake = btn.dataset.scope === 'stake';
+    for (const b of $('scope').children) {
+      const on = b === btn;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-checked', on);
+    }
+    applyScope();
+  });
+
+  function applyScope() {
+    scoped = onlyStake ? games.filter((g) => g[4] === 1) : games;
+    counts = providers.map(() => 0);
+    for (const g of scoped) counts[g[3]]++;
+    updatePool();
+    renderChips();
+  }
   clearBtn.addEventListener('click', () => {
     if (spinning) return;
     selected.clear();
@@ -508,10 +571,14 @@
   });
 
   function updatePool() {
-    pool = selected.size ? games.filter((g) => selected.has(g[3])) : games;
+    pool = selected.size ? scoped.filter((g) => selected.has(g[3])) : scoped;
     const n = pool.length.toLocaleString();
-    poolEl.innerHTML = `<strong>${n}</strong> slot${pool.length === 1 ? '' : 's'} in the pool` +
-      (selected.size ? ` · ${selected.size} provider${selected.size === 1 ? '' : 's'}` : ' · all providers');
+    if (!pool.length && onlyStake) {
+      poolEl.textContent = `No Stake-only slots from ${selected.size === 1 ? 'this provider' : 'these providers'}.`;
+    } else {
+      poolEl.innerHTML = `<strong>${n}</strong> ${onlyStake ? 'Stake-only ' : ''}slot${pool.length === 1 ? '' : 's'} in the pool` +
+        (selected.size ? ` · ${selected.size} provider${selected.size === 1 ? '' : 's'}` : ' · all providers');
+    }
     spinBtn.disabled = spinning || !pool.length;
     if (!spinning) idleStrip();
   }
@@ -594,7 +661,7 @@
         (src ? `<img src="${esc(src)}" alt="">` : '') +
         `<div>` +
           `<div class="result-lbl">Your slot</div>` +
-          `<div class="result-name">${esc(g[0])}</div>` +
+          `<div class="result-name">${esc(g[0])}${g[4] === 1 ? '<span class="excl-badge">Only on Stake</span>' : ''}</div>` +
           `<div class="result-prov">${esc(providers[g[3]])}</div>` +
           `<a class="play-btn" href="${esc(gameUrl(g))}" target="_blank" rel="noopener">Play on Stake ` +
             `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>` +
@@ -617,14 +684,13 @@
       providers = data.providers;
       keys = providers.map(norm);
       games = data.games.filter((g) => g[0] && providers[g[3]] !== undefined);
-      counts = providers.map(() => 0);
-      for (const g of games) counts[g[3]]++;
       statusEl.remove();
+      $('n-all').textContent = games.length.toLocaleString();
+      $('n-stake').textContent = games.filter((g) => g[4] === 1).length.toLocaleString();
       $('catalog-note').textContent =
         `${games.length.toLocaleString()} slots from Stake's catalog · updated ${data.updated}. ` +
         `Some games may be unavailable in your region.`;
-      updatePool();
-      renderChips();
+      applyScope();
     })
     .catch((err) => {
       console.error('Failed to load slots.json', err);

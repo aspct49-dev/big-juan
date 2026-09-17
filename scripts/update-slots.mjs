@@ -13,6 +13,8 @@
 //   and Backseat). The real studio is the game's group with type "provider",
 //   so that's what we read. A handful of games have no provider group; those
 //   fall back to a title-cased key.
+// - Games in the "Only on Stake" group get a trailing 1 in their row, which
+//   drives the picker's Only on Stake filter.
 // - What Stake returns can vary by region; this reflects wherever it's run.
 import { writeFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
@@ -32,7 +34,7 @@ const QUERY = `query ($limit: Int!, $offset: Int!) {
   slugKuratorGroup(slug: "slots") {
     gameCount
     groupGamesList(limit: $limit, offset: $offset) {
-      game { id name slug thumbnailUrl provider { name } groupGames { group { name type } } }
+      game { id name slug thumbnailUrl provider { name } groupGames { group { name slug type } } }
     }
   }
 }`
@@ -86,6 +88,7 @@ const rows = [...byId.values()].slice(0, MAX).map((g) => {
     slug: g.slug,
     img: thumb.startsWith(IMGIX) ? thumb.slice(IMGIX.length) : thumb,
     provider: studio || (key ? titleCase(key) : 'Other'),
+    exclusive: g.groupGames?.some((x) => x.group.slug === 'only-on-stake'),
   }
 })
 
@@ -99,6 +102,10 @@ const index = new Map(providers.map((p, i) => [p, i]))
 writeFileSync(OUT, JSON.stringify({
   updated: new Date().toISOString().slice(0, 10),
   providers,
-  games: rows.map((r) => [r.name, r.slug, r.img, index.get(r.provider)]),
+  games: rows.map((r) => {
+    const row = [r.name, r.slug, r.img, index.get(r.provider)]
+    if (r.exclusive) row.push(1)
+    return row
+  }),
 }))
-console.log(`Wrote ${rows.length} slots from ${providers.length} providers to ${OUT} (Stake lists ${total})`)
+console.log(`Wrote ${rows.length} slots (${rows.filter((r) => r.exclusive).length} only on Stake) from ${providers.length} providers to ${OUT} (Stake lists ${total})`)

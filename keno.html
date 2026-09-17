@@ -300,7 +300,8 @@
     @media (max-width: 860px) {
       nav#navbar { padding:0 20px; }
       .nav-left { gap:18px; }
-      .nav-links { gap:18px; }
+      .nav-links { gap:14px; }
+      .nav-links a { font-size:12px; letter-spacing:1px; }
       .keno-hero { padding:44px 20px 24px; }
       .keno-wrap { padding:28px 16px 64px; }
       .keno-top { grid-template-columns:1fr; }
@@ -309,6 +310,9 @@
       .footer-nav { align-items:center; }
       .footer-socials { justify-content:center; }
       .footer-disclaimer-row { margin:0 24px 24px; }
+    }
+    @media (max-width: 720px) {
+      .nav-links { display:none; }
     }
     @media (max-width: 600px) {
       .nav-links { display:none; }
@@ -347,6 +351,7 @@
       <a href="mines.html">Mines</a>
       <a href="slots.html">Slots</a>
       <a href="keno.html" class="active">Keno</a>
+      <a href="rewards.html">Rewards</a>
     </div>
   </div>
   <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="nav-cta">Claim Bonus</a>
@@ -447,6 +452,7 @@
         <a href="mines.html" class="footer-link">Mines</a>
         <a href="slots.html" class="footer-link">Slots</a>
         <a href="keno.html" class="footer-link">Keno</a>
+        <a href="rewards.html" class="footer-link">Rewards</a>
         <a href="https://stake.com/?c=Risky&offer=taco" target="_blank" rel="noopener" class="footer-link">Claim Bonus</a>
       </nav>
       <div class="footer-socials">
